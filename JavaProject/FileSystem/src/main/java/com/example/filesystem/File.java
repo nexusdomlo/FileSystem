@@ -8,27 +8,27 @@ public class File {
     double size;//占用的字节大小
     Folder parent;//父母文件夹
     String path;//路径
-    boolean open;//文件打开标志
-    public File(String fileName,String path,int num,Folder parent)
+    boolean open;//记录是否打开
+    int type;//记录文件的属性
+    public File(String fileName,String path,int num,Folder parent,int type,int flag)//新建文件操作的后端方法
     {
-        this.fileName=fileName;
-        this.path=path;
+        this.fileName=fileName;//可以从界面中输入的值来获取
+        this.path=path;//根据界面输入的时候的路径来获取
         this.num=num;
         this.parent=parent;
         this.content="";
-
-    }
-
-    public File(String name,int flag,int num,String content,double size,Folder parent,String path,boolean open)
-    {
-        fileName=name;
+        this.open=false;
+        this.size=0;
+        this.type=type;
         this.flag=flag;
-        this.num=num;
-        this.content=content;
-        this.size=size;
-        this.parent=parent;
-        this.path=path;
-        this.open=open;
+        disk D=FileSub.Disk;
+    /*    FAT fatTable = FileSub.FatTable;*/
+        D.blocks[num].BlockChange(-1,this,true);
+        //初始化一个文件，首先这个文件没有写任何的内容，直接index填上-1，object改成this(一般就是文件夹类和文件类），在哪个地方创建就填哪个，是否是begin文件，一般初始化第一个文件就是选择true
     }
+
+
+    public void changeFileContent(String content)//从前段里面提取相应的字符串
+    {}
 
 }
