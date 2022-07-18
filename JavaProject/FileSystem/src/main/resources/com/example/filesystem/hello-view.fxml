@@ -1,27 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.ScrollBar?>
-<?import javafx.scene.control.TreeView?>
+<?import javafx.scene.Scene?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.Pane?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.shape.Arc?>
 
-
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
-   <children>
-      <TreeView prefHeight="400.0" prefWidth="125.0" />
-      <VBox layoutX="535.0" prefHeight="400.0" prefWidth="65.0" />
-      <VBox layoutX="470.0" prefHeight="400.0" prefWidth="65.0" />
-      <Pane layoutX="124.0" prefHeight="166.0" prefWidth="353.0">
-         <children>
-            <Arc fill="DODGERBLUE" layoutX="92.0" layoutY="77.0" length="270.0" radiusX="78.0" radiusY="69.0" startAngle="45.0" stroke="BLACK" strokeType="INSIDE" type="ROUND" />
-         </children>
-      </Pane>
-      <Pane layoutX="124.0" layoutY="170.0" prefHeight="232.0" prefWidth="345.0">
-         <children>
-            <ScrollBar layoutX="340.0" orientation="VERTICAL" prefHeight="232.0" prefWidth="6.0" />
-         </children>
-      </Pane>
-   </children>
-</AnchorPane>
+<Scene xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
+    <AnchorPane fx:id="mainInterface" prefHeight="460.0" prefWidth="700.0">
+      <children>
+         <ImageView fitHeight="483.0" fitWidth="702.0" pickOnBounds="true" preserveRatio="true">
+            <image>
+               <Image url="@../../../../java/Image/main_BG.jpg" />
+            </image>
+         </ImageView>
+      </children></AnchorPane>
+</Scene>
