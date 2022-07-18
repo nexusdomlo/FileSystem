@@ -3,12 +3,18 @@ package com.example.filesystem;
 import java.util.ArrayList;
 
 public class FAT {
-    Folder root;//根目录
-    ArrayList<Object>filesOpened;//记录文件是否打开的列表
-    Block[] blocks;//128个磁盘块数组
-    public  FAT()
+    public int[] IndexArray;
+    public FAT()
     {
-
+        IndexArray=new int[128];
+        for(int i=0;i<128;i++)
+        {
+            if(i<=2)
+            {
+                IndexArray[i]=-1;
+            }
+            else
+                IndexArray[i]=0;
+        }
     }
-
 }
