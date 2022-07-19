@@ -15,34 +15,34 @@
 
 <AnchorPane fx:id="mainInterface" prefHeight="500.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
 <children>
-   <ImageView fx:id="main_BG" fitHeight="483.0" fitWidth="702.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
+   <ImageView fx:id="main_BG" fitHeight="483.0" fitWidth="702.0" pickOnBounds="true" preserveRatio="true">
       
       <image>
-         <Image url="file:/D:/warehouse/OS_experiment/JavaProject/FileSystem/src/main/java/Image/main_BG.jpg" />
+         <Image url="@../../../main_BG.jpg" />
       </image>
    </ImageView>
    <ImageView fx:id="Tips" fitHeight="40.0" fitWidth="40.0" layoutX="10.0" layoutY="8.0" pickOnBounds="true" preserveRatio="true">
-      <image>
-         <Image url="file:/D:/warehouse/OS_experiment/JavaProject/FileSystem/src/main/java/Image/Tips.png" />
-      </image>
+         <image>
+            <Image url="@../../../Tips.png" />
+         </image>
    </ImageView>
    <Label layoutX="18.0" layoutY="54.0" text="帮助" />
    <ImageView fx:id="AboutUs" fitHeight="40.0" fitWidth="40.0" layoutX="10.0" layoutY="77.0" pickOnBounds="true" preserveRatio="true">
       <image>
-         <Image url="file:/D:/warehouse/OS_experiment/JavaProject/FileSystem/src/main/java/Image/aboutUs.png" />
+         <Image url="@../../../aboutUs.png" />
       </image>
    </ImageView>
    <Label layoutX="6.0" layoutY="117.0" text="关于我们" />
-   <ImageView fx:id="FileStorage" fitHeight="40.0" fitWidth="40.0" layoutX="10.0" layoutY="149.0" pickOnBounds="true" preserveRatio="true">
+   <ImageView fx:id="FileStorage" fitHeight="40.0" fitWidth="40.0" layoutX="11.0" layoutY="149.0" pickOnBounds="true" preserveRatio="true">
       <image>
-         <Image url="file:/D:/warehouse/OS_experiment/JavaProject/FileSystem/src/main/java/Image/Storage.png" />
+         <Image url="@../../../Storage.png" />
       </image>
    </ImageView>
    <Label layoutX="6.0" layoutY="189.0" text="文件系统" />
-   <ComboBox layoutX="5.0" layoutY="467.0" prefHeight="35.0" prefWidth="35.0" />
-   <ImageView fx:id="StartMenu" fitHeight="35.0" fitWidth="35.0" layoutX="13.0" layoutY="467.0" pickOnBounds="true" preserveRatio="true">
+   <ComboBox layoutX="6.0" layoutY="466.0" prefHeight="35.0" prefWidth="35.0" />
+   <ImageView fx:id="StartMenu" fitHeight="35.0" fitWidth="35.0" layoutX="13.0" layoutY="466.0" pickOnBounds="true" preserveRatio="true">
       <image>
-         <Image url="file:/D:/warehouse/OS_experiment/JavaProject/FileSystem/src/main/java/Image/Menu.png" />
+         <Image url="@../../../Menu.png" />
       </image>
    </ImageView>
    <TabPane layoutX="72.0" layoutY="470.0" prefHeight="31.0" prefWidth="75.0" tabClosingPolicy="UNAVAILABLE">
@@ -52,7 +52,7 @@
          <Tab />
      </tabs>
    </TabPane>
-   <Pane fx:id="StoragePane" layoutX="95.0" layoutY="12.0" prefHeight="443.0" prefWidth="592.0" style="-fx-background-color: white;">
+   <Pane fx:id="StoragePane" layoutX="110.0" layoutY="8.0" prefHeight="443.0" prefWidth="592.0" style="-fx-background-color: white;">
       <children>
          <TreeView fx:id="TreeView" prefHeight="444.0" prefWidth="105.0" />
             <TableView layoutX="446.0" layoutY="30.0" prefHeight="414.0" prefWidth="148.0">
