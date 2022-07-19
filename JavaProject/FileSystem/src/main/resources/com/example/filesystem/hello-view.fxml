@@ -18,31 +18,31 @@
    <ImageView fx:id="main_BG" fitHeight="483.0" fitWidth="702.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
       
       <image>
-         <Image url="@../../../../java/Image/main_BG.jpg" />
+         <Image url="file:/D:/warehouse/OS_experiment/JavaProject/FileSystem/src/main/java/Image/main_BG.jpg" />
       </image>
    </ImageView>
    <ImageView fx:id="Tips" fitHeight="40.0" fitWidth="40.0" layoutX="10.0" layoutY="8.0" pickOnBounds="true" preserveRatio="true">
       <image>
-         <Image url="@../../../../java/Image/Tips.png" />
+         <Image url="file:/D:/warehouse/OS_experiment/JavaProject/FileSystem/src/main/java/Image/Tips.png" />
       </image>
    </ImageView>
    <Label layoutX="18.0" layoutY="54.0" text="帮助" />
    <ImageView fx:id="AboutUs" fitHeight="40.0" fitWidth="40.0" layoutX="10.0" layoutY="77.0" pickOnBounds="true" preserveRatio="true">
       <image>
-         <Image url="@../../../../java/Image/aboutUs.png" />
+         <Image url="file:/D:/warehouse/OS_experiment/JavaProject/FileSystem/src/main/java/Image/aboutUs.png" />
       </image>
    </ImageView>
    <Label layoutX="6.0" layoutY="117.0" text="关于我们" />
    <ImageView fx:id="FileStorage" fitHeight="40.0" fitWidth="40.0" layoutX="10.0" layoutY="149.0" pickOnBounds="true" preserveRatio="true">
       <image>
-         <Image url="@../../../../java/Image/Storage.png" />
+         <Image url="file:/D:/warehouse/OS_experiment/JavaProject/FileSystem/src/main/java/Image/Storage.png" />
       </image>
    </ImageView>
    <Label layoutX="6.0" layoutY="189.0" text="文件系统" />
    <ComboBox layoutX="5.0" layoutY="467.0" prefHeight="35.0" prefWidth="35.0" />
    <ImageView fx:id="StartMenu" fitHeight="35.0" fitWidth="35.0" layoutX="13.0" layoutY="467.0" pickOnBounds="true" preserveRatio="true">
       <image>
-         <Image url="@../../../../java/Image/Menu.png" />
+         <Image url="file:/D:/warehouse/OS_experiment/JavaProject/FileSystem/src/main/java/Image/Menu.png" />
       </image>
    </ImageView>
    <TabPane layoutX="72.0" layoutY="470.0" prefHeight="31.0" prefWidth="75.0" tabClosingPolicy="UNAVAILABLE">
