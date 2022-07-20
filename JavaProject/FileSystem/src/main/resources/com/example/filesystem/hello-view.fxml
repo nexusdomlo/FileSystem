@@ -1,17 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Tab?>
-<?import javafx.scene.control.TabPane?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TreeView?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.Pane?>
-<?import javafx.scene.text.Font?>
 
 <AnchorPane fx:id="mainInterface" prefHeight="500.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
 <children>
@@ -21,51 +16,40 @@
          <Image url="@../../../main_BG.jpg" />
       </image>
    </ImageView>
-   <ImageView fx:id="Tips" fitHeight="40.0" fitWidth="40.0" layoutX="10.0" layoutY="8.0" pickOnBounds="true" preserveRatio="true">
+   <ImageView fx:id="Tips" fitHeight="40.0" fitWidth="40.0" layoutX="269.0" layoutY="469.0" onMouseClicked="#Illustrate" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../../../Tips.png" />
          </image>
    </ImageView>
-   <Label layoutX="18.0" layoutY="54.0" text="帮助" />
-   <ImageView fx:id="AboutUs" fitHeight="40.0" fitWidth="40.0" layoutX="10.0" layoutY="77.0" pickOnBounds="true" preserveRatio="true">
+   <Label fx:id="label1" layoutX="18.0" layoutY="54.0" text="帮助" />
+   <ImageView fx:id="aboutUs" fitHeight="40.0" fitWidth="40.0" layoutX="351.0" layoutY="469.0" onMouseClicked="#State" pickOnBounds="true" preserveRatio="true">
       <image>
          <Image url="@../../../aboutUs.png" />
       </image>
    </ImageView>
-   <Label layoutX="6.0" layoutY="117.0" text="关于我们" />
-   <ImageView fx:id="FileStorage" fitHeight="40.0" fitWidth="40.0" layoutX="11.0" layoutY="149.0" pickOnBounds="true" preserveRatio="true">
+   <Label fx:id="label2" layoutX="6.0" layoutY="117.0" text="关于我们" />
+   <ImageView fx:id="fileStorage" fitHeight="40.0" fitWidth="40.0" layoutX="427.0" layoutY="469.0" onMouseClicked="#Store" pickOnBounds="true" preserveRatio="true">
       <image>
          <Image url="@../../../Storage.png" />
       </image>
    </ImageView>
-   <Label layoutX="6.0" layoutY="189.0" text="文件系统" />
-   <ComboBox layoutX="6.0" layoutY="466.0" prefHeight="35.0" prefWidth="35.0" />
-   <ImageView fx:id="StartMenu" fitHeight="35.0" fitWidth="35.0" layoutX="13.0" layoutY="466.0" pickOnBounds="true" preserveRatio="true">
-      <image>
-         <Image url="@../../../Menu.png" />
-      </image>
-   </ImageView>
-   <TabPane layoutX="72.0" layoutY="470.0" prefHeight="31.0" prefWidth="75.0" tabClosingPolicy="UNAVAILABLE">
-     <tabs>
-       <Tab />
-       <Tab />
-         <Tab />
-     </tabs>
-   </TabPane>
-   <Pane fx:id="StoragePane" layoutX="110.0" layoutY="8.0" prefHeight="443.0" prefWidth="592.0" style="-fx-background-color: white;">
-      <children>
-         <TreeView fx:id="TreeView" prefHeight="444.0" prefWidth="105.0" />
-            <TableView layoutX="446.0" layoutY="30.0" prefHeight="414.0" prefWidth="148.0">
-              <columns>
-                <TableColumn prefWidth="75.0" text="C1" />
-                <TableColumn prefWidth="75.0" text="C2" />
-              </columns>
-            </TableView>
-            <Label layoutX="496.0" layoutY="7.0" text="FAT 表" textAlignment="CENTER">
-               <font>
-                  <Font name="System Bold" size="15.0" />
-               </font>
-            </Label>
-      </children>
-   </Pane>
+   <Label fx:id="label3" layoutX="6.0" layoutY="189.0" text="文件系统" />
+      <MenuBar layoutX="-3.0" layoutY="467.0" prefHeight="40.0" prefWidth="40.0">
+         <menus>
+            <Menu mnemonicParsing="false">
+              <items>
+                <MenuItem mnemonicParsing="false" text="Action 1" />
+                  <MenuItem mnemonicParsing="false" text="Unspecified Action" />
+                  <MenuItem mnemonicParsing="false" text="Unspecified Action" />
+              </items>
+               <graphic>
+               <ImageView fx:id="startMenu" fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
+                  <image>
+                     <Image url="@../../../Menu.png" />
+                  </image>
+               </ImageView>
+               </graphic>
+            </Menu>
+         </menus>
+      </MenuBar>
 </children></AnchorPane>
