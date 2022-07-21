@@ -16,7 +16,7 @@
          <Image url="@../../../main_BG.jpg" />
       </image>
    </ImageView>
-   <ImageView fx:id="Tips" fitHeight="40.0" fitWidth="40.0" layoutX="269.0" layoutY="469.0" onMouseClicked="#Illustrate" pickOnBounds="true" preserveRatio="true">
+   <ImageView fx:id="Tips" fitHeight="40.0" fitWidth="40.0" layoutX="269.0" layoutY="469.0" onMouseClicked="#initIllustrate" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../../../Tips.png" />
          </image>
@@ -38,9 +38,10 @@
          <menus>
             <Menu mnemonicParsing="false">
               <items>
-                <MenuItem mnemonicParsing="false" text="Action 1" />
-                  <MenuItem mnemonicParsing="false" text="Unspecified Action" />
-                  <MenuItem mnemonicParsing="false" text="Unspecified Action" />
+                <MenuItem fx:id="menuItem1" mnemonicParsing="false" text="帮助" />
+                  <MenuItem fx:id="menuItem2" mnemonicParsing="false" text="关于我们" />
+                  <MenuItem fx:id="menuItem3" mnemonicParsing="false" text="文件系统" />
+                  <MenuItem fx:id="menuItem4" mnemonicParsing="false" text="关机" />
               </items>
                <graphic>
                <ImageView fx:id="startMenu" fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">

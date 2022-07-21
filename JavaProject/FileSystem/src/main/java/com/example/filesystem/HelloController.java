@@ -12,6 +12,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Text;
 import javafx.scene.text.Font;
+import javafx.stage.Stage;
 
 public class HelloController {
 
@@ -45,6 +46,23 @@ public class HelloController {
 
     @FXML
     private Label label3;
+
+    //帮助
+    @FXML
+    private MenuItem menuItem1;
+
+    //关于我们
+    @FXML
+    private MenuItem menuItem2;
+
+    //文件系统
+    @FXML
+    private MenuItem menuItem3;
+
+    //关机
+    @FXML
+    private MenuItem menuItem4;
+
 
     //文件系统界面
     @FXML
@@ -89,13 +107,19 @@ public class HelloController {
 
     //帮助按钮点击事件
     @FXML
-    void Illustrate(MouseEvent event) {
+    void initIllustrate(MouseEvent event) {
         ScrollPane sp = new ScrollPane();
-
-
+        Scene scene = new Scene(sp);
+        Stage helpStage = new Stage();
+        helpStage.setScene(scene);
+        helpStage.setTitle("帮助");
+        helpStage.setHeight(450);
+        helpStage.setWidth(550);
+        helpStage.show();
 
     }
 
+    //关于我们按钮点击事件
     @FXML
     void State(MouseEvent event) {
 
