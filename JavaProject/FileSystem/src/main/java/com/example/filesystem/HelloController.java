@@ -14,6 +14,8 @@ import javafx.scene.text.Text;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
+import java.nio.file.PathMatcher;
+
 public class HelloController {
 
 
@@ -38,14 +40,6 @@ public class HelloController {
     @FXML
     private ImageView main_BG;
 
-    @FXML
-    private Label label1;
-
-    @FXML
-    private Label label2;
-
-    @FXML
-    private Label label3;
 
     //帮助
     @FXML
@@ -76,9 +70,6 @@ public class HelloController {
     @FXML
     private TableView<?> tableView;
 
-    //树形结构存储图
-    @FXML
-    private TreeView<?> treeView;
 
 
 //    @FXML
@@ -108,13 +99,26 @@ public class HelloController {
     //帮助按钮点击事件
     @FXML
     void initIllustrate(MouseEvent event) {
-        ScrollPane sp = new ScrollPane();
+        //滚动面板
+       ScrollPane sp = new ScrollPane();
+        //纵向滚动条
+        sp.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        TextArea textarea = new TextArea("命令类型：操作类型 目录名\\文件名\n          默认最初的目录为根目录\n          命令中，最后的指令名字前带$指类型是目录 例如 create a\\$b 在a目录下创建b目录\n                                                  create a\\b 在目录下创建b文件 \n          改变文件属性中OR为只读 RAW为读与写 例如 change a.OR 改为只读 \n                                                  change a.RAW 改为读与写 \n                                 创建出来的文件默认是读与写 不支持文件夹属性改变 \n创建命令：create \n          例子 创建文件：create a        在b文件夹中创建文件 create b\\a \n            创建文件夹：create $c       在文件夹中创建文件夹 create b\\$c \n打开命令：open\n          例子 打开文件：open a        打开文件夹下的文件 open b\\a\n            打开文件夹：open $c       打开文件夹下的文件夹 open b\\$c\n\n关闭命令：close\n          例子 关闭文件：close a       关闭文件夹下的文件 close b\\a\n            关闭文件夹：close $c      关闭文件夹下的文件夹 close b\\$c\n\n以下命令列子相似\n\n删除命令：delete\n\n查询命令：search\n\n改变文件属性命令（只支持文件类型）：change\n                                    例如 change a.OR 改为只读\n                                        change a.RAW 改为读与写 \n\t\t\t\t创建出来的文件默认是读与写 不支持文件夹属性改变\n");
+        //自动换行
+        textarea.setWrapText(true);
+
+        textarea. setEditable(false);
+        //sp.getChildren().add(textarea);
         Scene scene = new Scene(sp);
+
         Stage helpStage = new Stage();
         helpStage.setScene(scene);
+
         helpStage.setTitle("帮助");
         helpStage.setHeight(450);
         helpStage.setWidth(550);
+        //窗体大小不可拉伸
+        helpStage.setResizable(false);
         helpStage.show();
 
     }
@@ -122,12 +126,40 @@ public class HelloController {
     //关于我们按钮点击事件
     @FXML
     void State(MouseEvent event) {
-
+        Pane commandPane = new Pane();
+        Stage aboutStage = new Stage();
+        Scene scene = new Scene(commandPane,400,300);
+        aboutStage.setScene(scene);
+        //文本框
+        TextArea textarea = new TextArea("\n\n\t\t\t\t\t模拟文件操作系统     \t \n   \t\t\t\t\t 前端：沈晓敏      \t \n   \t\t\t\t\t 后端：黄顺豪        \t \n");
+        //大小
+        textarea.setFont(Font.font(5));
+        //加粗
+        textarea.setStyle("-fx-font-weight:bold");
+        //textarea.setStyle("-fx-font-size:10");
+        //自动换行
+        textarea.setWrapText(true);
+        //初始化设置行数
+        textarea.setPrefRowCount(20);
+        //textarea.setText("setText");
+        commandPane.getChildren().add(textarea);
+        //窗口不可拉伸
+        aboutStage.setResizable(false);
+        aboutStage.setTitle("关于我们");
+        aboutStage.show();
     }
 
     @FXML
     void Store(MouseEvent event) {
+        Pane commandPane = new Pane();
 
+        TreeView treeView = new TreeView();
+        Stage startStage = new Stage();
+        Scene scene = new Scene(commandPane,500,500);
+        startStage.setScene(scene);
+        startStage.setResizable(false);
+        startStage.setTitle("文件系统");
+        startStage.show();
     }
 
 

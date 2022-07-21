@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
@@ -8,7 +7,7 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane fx:id="mainInterface" prefHeight="500.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane fx:id="mainInterface" prefHeight="510.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.filesystem.HelloController">
 <children>
    <ImageView fx:id="main_BG" fitHeight="483.0" fitWidth="702.0" pickOnBounds="true" preserveRatio="true">
       
@@ -21,20 +20,17 @@
             <Image url="@../../../Tips.png" />
          </image>
    </ImageView>
-   <Label fx:id="label1" layoutX="18.0" layoutY="54.0" text="帮助" />
    <ImageView fx:id="aboutUs" fitHeight="40.0" fitWidth="40.0" layoutX="351.0" layoutY="469.0" onMouseClicked="#State" pickOnBounds="true" preserveRatio="true">
       <image>
          <Image url="@../../../aboutUs.png" />
       </image>
    </ImageView>
-   <Label fx:id="label2" layoutX="6.0" layoutY="117.0" text="关于我们" />
    <ImageView fx:id="fileStorage" fitHeight="40.0" fitWidth="40.0" layoutX="427.0" layoutY="469.0" onMouseClicked="#Store" pickOnBounds="true" preserveRatio="true">
       <image>
          <Image url="@../../../Storage.png" />
       </image>
    </ImageView>
-   <Label fx:id="label3" layoutX="6.0" layoutY="189.0" text="文件系统" />
-      <MenuBar layoutX="-3.0" layoutY="467.0" prefHeight="40.0" prefWidth="40.0">
+      <MenuBar fx:id="startMenuBar" layoutX="-3.0" layoutY="467.0" prefHeight="40.0" prefWidth="40.0">
          <menus>
             <Menu mnemonicParsing="false">
               <items>
