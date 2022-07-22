@@ -152,14 +152,25 @@ public class HelloController {
     @FXML
     void Store(MouseEvent event) {
         Pane commandPane = new Pane();
+        TreeItem<String> root = new TreeItem("ROOT");
+        root.setExpanded(true);
+        TreeView tree = new TreeView(root);
+        tree.setMaxWidth(100.0D);
+        tree.setMaxHeight(500.0D);
+        tree.setEditable(true);
+        //addTreeItem();
 
-        TreeView treeView = new TreeView();
+        commandPane.getChildren().add(tree);
         Stage startStage = new Stage();
         Scene scene = new Scene(commandPane,500,500);
         startStage.setScene(scene);
         startStage.setResizable(false);
         startStage.setTitle("文件系统");
         startStage.show();
+    }
+
+    public static void addTreeItem(File thefile){
+
     }
 
 
