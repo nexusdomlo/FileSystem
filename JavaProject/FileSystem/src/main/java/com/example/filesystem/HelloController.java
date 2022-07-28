@@ -19,8 +19,8 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 import java.nio.file.PathMatcher;
-
-import static com.example.filesystem.HelloController.GlobalMenu.INSTANCE;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 
 public class HelloController {
 
@@ -215,8 +215,8 @@ public class HelloController {
             TreeItem newTreeItem = new TreeItem(fileName);
         }
     }
-
-    public class GlobalMenu extends ContextMenu {
+@SuppressWarnings("restriction")
+    public static class GlobalMenu extends ContextMenu {
         //单例
         private static GlobalMenu INSTANCE = null;
 
