@@ -7,7 +7,7 @@ public class File {
     String content;//文档中保存的字符串
     double size;//占用的字节大小
     Folder parent;//父母文件夹
-    String path;//路径
+    String path;//路径S
     boolean open;//记录是否打开
     int type;//记录文件的属性
     public File(String fileName,String path,int num,Folder parent,int type,int flag)//新建文件操作的后端方法

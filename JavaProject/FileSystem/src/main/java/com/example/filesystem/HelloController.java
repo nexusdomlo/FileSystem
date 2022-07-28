@@ -2,11 +2,15 @@ package com.example.filesystem;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.geometry.Side;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.chart.PieChart;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
@@ -16,9 +20,12 @@ import javafx.stage.Stage;
 
 import java.nio.file.PathMatcher;
 
+import static com.example.filesystem.HelloController.GlobalMenu.INSTANCE;
+
 public class HelloController {
 
 
+    private static final GlobalMenu INSTANCE = null;
     //帮助按钮
     @FXML
     private ImageView Tips;
@@ -151,26 +158,97 @@ public class HelloController {
 
     @FXML
     void Store(MouseEvent event) {
+        String fileName;
         Pane commandPane = new Pane();
         TreeItem<String> root = new TreeItem("ROOT");
         root.setExpanded(true);
+
         TreeView tree = new TreeView(root);
         tree.setMaxWidth(100.0D);
         tree.setMaxHeight(500.0D);
         tree.setEditable(true);
-        //addTreeItem();
+        //addTree(fileName);
 
+//        //创建右键菜单
+//        ContextMenu contextMenu = new ContextMenu();
+//        //菜单项
+//        MenuItem item1 = new MenuItem("新建文件");
+//        MenuItem item2 = new MenuItem("新建文件夹");
+//        contextMenu.getItems().addAll(item1,item2);
+//        //添加右键菜单到label
+//        label.setContextMenu(contextMenu);
         commandPane.getChildren().add(tree);
-        Stage startStage = new Stage();
         Scene scene = new Scene(commandPane,500,500);
+//        scene.addEventFilter(MouseEvent.MOUSE_CLICKED,new EventHandler<MouseEvent>(){
+//            @Override
+//            public void handle(MouseEvent event){
+//                Label label = new Label();
+//                //右键菜单
+//                //创建右键菜单
+//                ContextMenu contextMenu = new ContextMenu();
+//                //菜单项
+//                MenuItem item1 = new MenuItem("新建文件");
+//                MenuItem item2 = new MenuItem("新建文件夹");
+//                contextMenu.getItems().addAll(item1,item2);
+//                //添加右键菜单到label
+//                label.setContextMenu(contextMenu);
+//                Scene rs = new Scene(label,100,100);
+//                Stage rstage = new Stage();
+//                rstage.setScene(rs);
+//                rstage.show();
+//            }
+//        });
+        Stage startStage = new Stage();
         startStage.setScene(scene);
         startStage.setResizable(false);
         startStage.setTitle("文件系统");
         startStage.show();
+
     }
 
-    public static void addTreeItem(File thefile){
+    public static void addTree(String fileName){
+        String str = fileName.substring(0,1);
+        if(str.equals('$')){
+           TreeItem newTreeItem = new TreeItem<String>(fileName);
+        }
+        else{
+            TreeItem newTreeItem = new TreeItem(fileName);
+        }
+    }
 
+    public class GlobalMenu extends ContextMenu {
+        //单例
+        private static GlobalMenu INSTANCE = null;
+
+        //私有构造函数
+        private GlobalMenu() {
+            MenuItem fileMenuItem = new MenuItem("新建文件");
+            MenuItem folderMenuItem = new MenuItem("新建文件夹");
+            getItems().add(fileMenuItem);
+            getItems().add(folderMenuItem);
+        }
+
+        //获取实例
+        public static GlobalMenu getInstance() {
+            if (INSTANCE == null) {
+                INSTANCE = new GlobalMenu();
+            }
+            return INSTANCE;
+        }
+    }
+
+
+    public void addRightMenu(TreeView treeView){
+        treeView.addEventFilter(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                Node node = event.getPickResult().getIntersectedNode();
+                //给node对象添加下拉菜单
+                GlobalMenu.getInstance().show(node, Side.BOTTOM,0,0);
+                String name = (String) ((TreeItem) treeView.getSelectionModel().getSelectedItem()).getValue();
+                System.out.println("Node click:" + name);
+            }
+        });
     }
 
 
