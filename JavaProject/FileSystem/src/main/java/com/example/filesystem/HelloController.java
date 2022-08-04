@@ -2,10 +2,12 @@ package com.example.filesystem;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
+import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.chart.PieChart;
@@ -194,10 +196,28 @@ public class HelloController {
         hbox.getChildren().addAll(label,field);
         commandPane.getChildren().add(hbox);
           //Scene hbScene = new Scene(hbPane);
+
+        //饼图
+        ObservableList<PieChart.Data> pieChartData =
+                FXCollections.observableArrayList(
+                        new PieChart.Data("沈阳",13),
+                        new PieChart.Data("鞍山",25),
+                        new PieChart.Data("盘锦",10),
+                        new PieChart.Data("大连",22),
+                        new PieChart.Data("葫芦岛",30));
+        PieChart pieChart = new PieChart(pieChartData);
+        pieChart.setTitle("资源分布");
+        //Group group = new Group();
+        //group.getChildren().add(pieChart);
+        Scene s1 = new Scene(new Group());
+        ((Group) s1.getRoot()).getChildren().add(pieChart);
+
         Scene cscene = new Scene(commandPane,500,500);
+
         addRightMenu(tree);
         Stage startStage = new Stage();
         startStage.setScene(cscene);
+        startStage.setScene(s1);
           //startStage.setScene(hbScene);
         startStage.setResizable(false);
         startStage.setTitle("文件系统");
@@ -223,20 +243,21 @@ public class HelloController {
         //私有构造函数
         private GlobalMenu() {
             MenuItem fileMenuItem = new MenuItem("新建文件");
-            fileMenuItem.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+            fileMenuItem.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
-                public void handle(MouseEvent event) {
+                public void handle(ActionEvent actionEvent) {
                     createFile();
                 }
             });
             
             MenuItem folderMenuItem = new MenuItem("新建文件夹");
-            folderMenuItem.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+            folderMenuItem.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
-                public void handle(MouseEvent event) {
+                public void handle(ActionEvent actionEvent) {
                     createFolder();
                 }
             });
+
             getItems().add(fileMenuItem);
             getItems().add(folderMenuItem);
         }
