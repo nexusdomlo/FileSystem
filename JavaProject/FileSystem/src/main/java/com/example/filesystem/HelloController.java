@@ -4,23 +4,26 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.chart.PieChart;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Text;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 import java.nio.file.PathMatcher;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuItem;
+
+//import static com.example.filesystem.HelloController.GlobalMenu.INSTANCE;
 
 public class HelloController {
 
@@ -156,50 +159,46 @@ public class HelloController {
         aboutStage.show();
     }
 
+    //文件系统按钮
     @FXML
     void Store(MouseEvent event) {
-        String fileName;
+        String filename = new String();
         Pane commandPane = new Pane();
-        TreeItem<String> root = new TreeItem("ROOT");
+        TreeItem<String>  root = new TreeItem("ROOT");
         root.setExpanded(true);
-
         TreeView tree = new TreeView(root);
         tree.setMaxWidth(100.0D);
-        tree.setMaxHeight(500.0D);
+        tree.setMaxHeight(700.0D);
         tree.setEditable(true);
-        //addTree(fileName);
-
-//        //创建右键菜单
-//        ContextMenu contextMenu = new ContextMenu();
-//        //菜单项
-//        MenuItem item1 = new MenuItem("新建文件");
-//        MenuItem item2 = new MenuItem("新建文件夹");
-//        contextMenu.getItems().addAll(item1,item2);
-//        //添加右键菜单到label
-//        label.setContextMenu(contextMenu);
+        //addTree(filename);
         commandPane.getChildren().add(tree);
-        Scene scene = new Scene(commandPane,500,500);
-//        scene.addEventFilter(MouseEvent.MOUSE_CLICKED,new EventHandler<MouseEvent>(){
-//            @Override
-//            public void handle(MouseEvent event){
-//                Label label = new Label();
-//                //右键菜单
-//                //创建右键菜单
-//                ContextMenu contextMenu = new ContextMenu();
-//                //菜单项
-//                MenuItem item1 = new MenuItem("新建文件");
-//                MenuItem item2 = new MenuItem("新建文件夹");
-//                contextMenu.getItems().addAll(item1,item2);
-//                //添加右键菜单到label
-//                label.setContextMenu(contextMenu);
-//                Scene rs = new Scene(label,100,100);
-//                Stage rstage = new Stage();
-//                rstage.setScene(rs);
-//                rstage.show();
-//            }
-//        });
+
+        //单行输入框
+          //Pane hbPane = new Pane();
+        HBox hbox = new HBox();
+        Label label = new Label("ROOT:>");
+        //label.setPadding(15,15,20,20);
+        hbox.setLayoutX(110);
+        hbox.setLayoutY(20);
+        TextField field = new TextField();
+         //设置单行输入框的宽高
+        field.setPrefSize(150,20);
+         //能否编辑
+        field.setEditable(true);
+         //单行输入框的提示语
+        field.setPromptText("请输入指令");
+         //设置单行输入框的对齐方式
+        field.setAlignment(Pos.CENTER_LEFT);
+         //设置单行输入框的推荐列数
+        field.setPrefColumnCount(11);
+        hbox.getChildren().addAll(label,field);
+        commandPane.getChildren().add(hbox);
+          //Scene hbScene = new Scene(hbPane);
+        Scene cscene = new Scene(commandPane,500,500);
+        addRightMenu(tree);
         Stage startStage = new Stage();
-        startStage.setScene(scene);
+        startStage.setScene(cscene);
+          //startStage.setScene(hbScene);
         startStage.setResizable(false);
         startStage.setTitle("文件系统");
         startStage.show();
@@ -215,7 +214,8 @@ public class HelloController {
             TreeItem newTreeItem = new TreeItem(fileName);
         }
     }
-@SuppressWarnings("restriction")
+
+    //添加右键菜单
     public static class GlobalMenu extends ContextMenu {
         //单例
         private static GlobalMenu INSTANCE = null;
@@ -223,7 +223,20 @@ public class HelloController {
         //私有构造函数
         private GlobalMenu() {
             MenuItem fileMenuItem = new MenuItem("新建文件");
+            fileMenuItem.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent event) {
+                    createFile();
+                }
+            });
+            
             MenuItem folderMenuItem = new MenuItem("新建文件夹");
+            folderMenuItem.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent event) {
+                    createFolder();
+                }
+            });
             getItems().add(fileMenuItem);
             getItems().add(folderMenuItem);
         }
@@ -237,7 +250,6 @@ public class HelloController {
         }
     }
 
-
     public void addRightMenu(TreeView treeView){
         treeView.addEventFilter(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
             @Override
@@ -250,6 +262,34 @@ public class HelloController {
             }
         });
     }
+
+    //新建文件
+    public static void createFile(){
+        Pane filePane = new Pane();
+        ImageView view = new ImageView();
+        Image icon = new Image("Txt.png");
+        view.setImage(icon);
+        filePane.getChildren().add(view);
+        Scene fileScene = new Scene(filePane,300,300);
+        Stage fileStage = new Stage();
+        fileStage.setScene(fileScene);
+        fileStage.setTitle("新建文件");
+        fileStage.show();
+    }
+
+    //新建文件夹
+    public static void createFolder(){
+        Pane folderPane = new Pane();
+        Image icon1 = new Image("File.png");
+        ImageView view1 = new ImageView();
+        view1.setImage(icon1);
+        folderPane.getChildren().add(view1);
+        Scene folderScene = new Scene(folderPane,300,300);
+        Stage folderStage = new Stage();
+        folderStage.setScene(folderScene);
+        folderStage.show();
+    }
+
 
 
 }
