@@ -34,9 +34,9 @@
          <menus>
             <Menu mnemonicParsing="false">
               <items>
-                <MenuItem fx:id="menuItem1" mnemonicParsing="false" text="帮助" />
-                  <MenuItem fx:id="menuItem2" mnemonicParsing="false" text="关于我们" />
-                  <MenuItem fx:id="menuItem3" mnemonicParsing="false" text="文件系统" />
+                <MenuItem fx:id="menuItem1" mnemonicParsing="false" text="关于我们" />
+                  <MenuItem fx:id="menuItem2" mnemonicParsing="false" text="存储" />
+                  <MenuItem fx:id="menuItem3" mnemonicParsing="false" text="帮助" />
                   <MenuItem fx:id="menuItem4" mnemonicParsing="false" text="关机" />
               </items>
                <graphic>
