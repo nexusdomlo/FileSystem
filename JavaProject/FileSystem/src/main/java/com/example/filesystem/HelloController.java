@@ -104,49 +104,16 @@ public class HelloController {
     void initIllustrate(MouseEvent event) {
         //滚动面板
         VBox vb = new VBox();
-        ScrollBar sc = new ScrollBar();
         Group gp = new Group();
-        Scene scene = new Scene(gp,550,450);
+        Scene scene = new Scene(gp,520,200);
         Stage helpStage = new Stage();
         helpStage.setScene(scene);
         helpStage.setTitle("帮助");
         //窗体大小不可拉伸
         helpStage.setResizable(false);
-        gp.getChildren().addAll(sc,vb);
-
-        //设置VBox布局器的水平方向左侧布局位置，5个像素
-        vb.setLayoutX(5);
-        vb.setSpacing(10);
-
-        sc.setLayoutX(scene.getWidth() - sc.getWidth());
-        sc.setMin(0);
-        sc.setOrientation(Orientation.VERTICAL);
-        //ScrollBar对象的初始化高度
-        sc.setPrefHeight(450);
-        //ScrollBar对象的活动位置最大值
-        sc.setMax(360);
-
-        sc.setUnitIncrement(10.0);
-        sc.setBlockIncrement(5.0);
 
         TextArea text = new TextArea("命令类型：操作类型 目录名\\文件名\n          默认最初的目录为根目录\n          命令中，最后的指令名字前带$指类型是目录 例如 create a\\$b 在a目录下创建b目录\n                                                  create a\\b 在目录下创建b文件 \n          改变文件属性中OR为只读 RAW为读与写 例如 change a.OR 改为只读 \n                                                  change a.RAW 改为读与写 \n                                 创建出来的文件默认是读与写 不支持文件夹属性改变 \n创建命令：create \n          例子 创建文件：create a        在b文件夹中创建文件 create b\\a \n            创建文件夹：create $c       在文件夹中创建文件夹 create b\\$c \n打开命令：open\n          例子 打开文件：open a        打开文件夹下的文件 open b\\a\n            打开文件夹：open $c       打开文件夹下的文件夹 open b\\$c\n\n关闭命令：close\n          例子 关闭文件：close a       关闭文件夹下的文件 close b\\a\n            关闭文件夹：close $c      关闭文件夹下的文件夹 close b\\$c\n\n以下命令列子相似\n\n删除命令：delete\n\n查询命令：search\n\n改变文件属性命令（只支持文件类型）：change\n                                    例如 change a.OR 改为只读\n                                        change a.RAW 改为读与写 \n\t\t\t\t创建出来的文件默认是读与写 不支持文件夹属性改变\n");
         gp.getChildren().add(text);
-
-//         //ScrollBar对象进行改变值事件监听处理机制
-//        sc.valueProperty().addListener((ObservableValue<? extends Number> ov,
-//                                        Number old_val, Number new_val) -> {
-//            vb.setLayoutY(-new_val.doubleValue());
-//        });
-
-         //为垂直VBOX实现滚动
-//        sc.valueProperty().addListener((ObservableValue<? extends Number> ov,
-//                                        Number old_val, Number new_val) -> {
-//            vb.setLayoutY(-new_val.doubleValue());
-//        });
-          sc.valueProperty().addListener((ov, old_val, new_val) -> {
-              vb.setLayoutY(-new_val.doubleValue());
-          });
-
 
 
         helpStage.show();
@@ -197,7 +164,7 @@ public class HelloController {
         HBox hbox = new HBox();
         Label label = new Label("ROOT:>");
         //label.setPadding(15,15,20,20);
-        hbox.setLayoutX(110);
+        hbox.setLayoutX(130);
         hbox.setLayoutY(20);
         TextField field = new TextField();
          //设置单行输入框的宽高
@@ -298,13 +265,33 @@ public class HelloController {
         });
     }
 
-    //新建文件
+    //新建文件窗口
     public static void createFile(){
         Pane filePane = new Pane();
         ImageView view = new ImageView();
         Image icon = new Image("Txt.png");
         view.setImage(icon);
-        filePane.getChildren().add(view);
+        view.setFitWidth(80);
+        view.setFitHeight(80);
+        view.setLayoutX(100);
+        view.setLayoutY(20);
+        HBox hb1 = new HBox();
+        Label l1 = new Label("请输入文件名");
+        hb1.getChildren().add(l1);
+        hb1.setLayoutX(100);
+        hb1.setLayoutY(110);
+        HBox hb2 = new HBox();
+        TextField f1 = new TextField();
+        hb2.getChildren().add(f1);
+        hb2.setLayoutX(60);
+        hb2.setLayoutY(130);
+        Button bt1 = new Button("确定");
+        bt1.setLayoutX(75);
+        bt1.setLayoutY(170);
+        Button bt2 = new Button("取消");
+        bt2.setLayoutX(160);
+        bt2.setLayoutY(170);
+        filePane.getChildren().addAll(view,hb1,hb2,bt1,bt2);
         Scene fileScene = new Scene(filePane,300,300);
         Stage fileStage = new Stage();
         fileStage.setScene(fileScene);
@@ -312,16 +299,37 @@ public class HelloController {
         fileStage.show();
     }
 
-    //新建文件夹
+    //新建文件夹窗口
     public static void createFolder(){
         Pane folderPane = new Pane();
         Image icon1 = new Image("File.png");
         ImageView view1 = new ImageView();
         view1.setImage(icon1);
-        folderPane.getChildren().add(view1);
+        view1.setFitWidth(80);
+        view1.setFitHeight(80);
+        view1.setLayoutX(100);
+        view1.setLayoutY(20);
+        HBox hb1 = new HBox();
+        Label l1 = new Label("请输入文件夹名");
+        hb1.getChildren().add(l1);
+        hb1.setLayoutX(100);
+        hb1.setLayoutY(100);
+        HBox hb2 = new HBox();
+        TextField f1 = new TextField();
+        hb2.getChildren().add(f1);
+        hb2.setLayoutX(70);
+        hb2.setLayoutY(125);
+        Button bt1 = new Button("确定");
+        bt1.setLayoutX(85);
+        bt1.setLayoutY(170);
+        Button bt2 = new Button("取消");
+        bt2.setLayoutX(160);
+        bt2.setLayoutY(170);
+        folderPane.getChildren().addAll(view1,hb1,hb2,bt1,bt2);
         Scene folderScene = new Scene(folderPane,300,300);
         Stage folderStage = new Stage();
         folderStage.setScene(folderScene);
+        folderStage.setTitle("新建文件夹");
         folderStage.show();
     }
 
