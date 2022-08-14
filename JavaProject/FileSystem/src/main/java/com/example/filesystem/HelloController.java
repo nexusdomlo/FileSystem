@@ -4,8 +4,10 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
@@ -21,9 +23,12 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.text.Text;
 import javafx.scene.text.Font;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
 import java.nio.file.PathMatcher;
+import java.util.ArrayList;
+import java.util.List;
 
 //import static com.example.filesystem.HelloController.GlobalMenu.INSTANCE;
 
@@ -150,22 +155,92 @@ public class HelloController {
     void Store(MouseEvent event) {
         String filename = new String();
         Pane commandPane = new Pane();
+        Scene scene = new Scene(commandPane,700,550);
+        Stage startStage = new Stage();
+        startStage.setScene(scene);
+        startStage.setResizable(false);
+        startStage.setTitle("存储");
+
+        //左侧树形区域
         TreeItem<String>  root = new TreeItem("ROOT");
+        VBox vb = new VBox();
+        vb.setPrefHeight(600);
         root.setExpanded(true);
         TreeView tree = new TreeView(root);
         tree.setMaxWidth(100.0D);
-        tree.setMaxHeight(700.0D);
+        tree.setMaxHeight(500.0D);
+        tree.setLayoutX(0);
+        tree.setLayoutY(0);
         tree.setEditable(true);
         //addTree(filename);
-        commandPane.getChildren().add(tree);
+        vb.getChildren().add(tree);
+        commandPane.getChildren().add(vb);
+        addRightMenu(tree);
 
+        //Disk区域
+        HBox hb = new HBox();
+        Label l = new Label("磁盘资源使用情况");
+        l.setFont(Font.font("Time New Roman",15));
+        hb.getChildren().add(l);
+        hb.setLayoutY(2);
+        hb.setLayoutX(100);
+        Pane dp =new Pane();
+        dp.getChildren().add(hb);
+        dp.setLayoutX(80);
+        dp.setLayoutY(6);
+        dp.setMaxHeight(300);
+        dp.setMaxHeight(300);
+        commandPane.getChildren().add(dp);
+
+        //饼图
+        ObservableList<PieChart.Data> pieChartData =
+                FXCollections.observableArrayList(
+                        new PieChart.Data("已使用",20),
+                        new PieChart.Data("未使用",80));
+        PieChart pieChart = new PieChart(pieChartData);
+         //设置标签不可见
+        pieChart.setLabelsVisible(false);
+        pieChart.setPrefSize(220,220);
+        pieChart.setLayoutY(9);
+        pieChart.setLayoutX(5);
+         //设置图表旋转
+        pieChart.setClockwise(false);
+        pieChart.setStartAngle(90);
+        dp.getChildren().add(pieChart);
+
+        //diskUsing区域
+        List<StackPane> disk = new ArrayList();
+        GridPane myPane = new GridPane();
+        myPane.setStyle("-fx-background-color: #fff");
+        myPane.setVgap(3.0D); //两个格子之间的垂直距离
+        myPane.setHgap(3.0D); //两个格子之间的水平距离
+        myPane.setLayoutX(200);
+        myPane.setLayoutY(25);
+        myPane.setPadding(new Insets(3.0D, 3.0D, 3.0D, 3.0D));
+        for(int i = 0; i < 128; ++i) {
+            Text numberLabel = new Text(String.valueOf(i));
+            StackPane stackPane = new StackPane();
+            stackPane.getChildren().add(numberLabel);
+            stackPane.setStyle("-fx-background-color: #c8c8c8");
+            final Text text = (Text)stackPane.getChildren().get(0);
+            stackPane.setOnMouseClicked(new EventHandler<Event>() {
+                public void handle(Event arg0) {
+                    System.out.println("点击" + text.getText() + "号块");
+                }
+            });
+            disk.add(i, stackPane);
+            myPane.add(stackPane, i % 8, i / 8);
+        }
+        dp.getChildren().add(myPane);
+
+        //输入指令部分
         //单行输入框
         Pane hbPane = new Pane();
         HBox hbox = new HBox();
         Label label = new Label("ROOT:>");
         //label.setPadding(15,15,20,20);
-        hbox.setLayoutX(130);
-        hbox.setLayoutY(20);
+        hbox.setLayoutX(180);
+        hbox.setLayoutY(340);
         TextField field = new TextField();
          //设置单行输入框的宽高
         field.setPrefSize(150,20);
@@ -181,27 +256,49 @@ public class HelloController {
         hbPane.getChildren().add(hbox);
         commandPane.getChildren().add(hbPane);
 
-        //饼图
-        ObservableList<PieChart.Data> pieChartData =
-                FXCollections.observableArrayList(
-                        new PieChart.Data("沈阳",50),
-                        new PieChart.Data("鞍山",50));
-        PieChart pieChart = new PieChart(pieChartData);
-        pieChart.setTitle("磁盘资源使用情况");
-        //设置标签可见
-        pieChart.setLabelsVisible(true);
-        Pane p =new Pane();
-        p.getChildren().add(pieChart);
-        p.setLayoutX(100);
-        p.setLayoutY(100);
-        commandPane.getChildren().add(p);
-        Scene scene = new Scene(commandPane,500,500);
 
-        addRightMenu(tree);
-        Stage startStage = new Stage();
-        startStage.setScene(scene);
-        startStage.setResizable(false);
-        startStage.setTitle("存储");
+        //FAT表
+        VBox numberBox = new VBox();
+        VBox backgroundBox = new VBox();
+        VBox contentBox = new VBox();
+        Label[] numberLabel = new Label[128];
+        Label[] contentLabel = new Label[128];
+        HBox hBox = new HBox(new Node[]{numberBox, contentBox});
+        hBox.setSpacing(5.0D);
+        ScrollPane scrollPane = new ScrollPane(hBox);
+        scrollPane.setMaxHeight(520.0D);
+        scrollPane.setMinWidth(100.0D);
+        Text fatTitle = new Text("FAT表");
+        fatTitle.setFont(Font.font(15.0D));
+        fatTitle.setWrappingWidth(220.0D);
+        fatTitle.setTextAlignment(TextAlignment.CENTER);
+        VBox rootVBox = new VBox(new Node[]{fatTitle, scrollPane});
+        rootVBox.setPadding(new Insets(5.0D, 0.0D, 0.0D, 0.0D));
+        rootVBox.setLayoutY(5);
+        rootVBox.setLayoutX(480);
+        commandPane.getChildren().add(rootVBox);
+
+        contentBox.setSpacing(5.0D);
+        contentBox.setMinWidth(100.0D);
+
+        //FAT表左侧部分(contentBox)
+        for(int i = 0; i < 128; ++i) {
+            contentLabel[i] = new Label(String.valueOf(i));
+            StackPane stackPane = new StackPane(new Node[]{contentLabel[i]});
+            stackPane.setStyle("-fx-background-color: #c8c8c8");
+            contentBox.getChildren().add(stackPane);
+        }
+
+        //FAT表右侧numberBox区域
+        numberBox.setSpacing(5.0D);
+        numberBox.setMinWidth(100.0D);
+
+        for(int i = 0; i < 128; ++i) {
+            numberLabel[i] = new Label(String.valueOf(i));
+            StackPane stackPane = new StackPane(new Node[]{numberLabel[i]});
+            stackPane.setStyle("-fx-background-color: #c8c8c8");
+            numberBox.getChildren().add(stackPane);
+        }
         startStage.show();
 
     }
