@@ -172,9 +172,9 @@ public class HelloController {
         treeView.setLayoutX(0);
         treeView.setLayoutY(0);
         treeView.setEditable(true);
-         //将TreeView对象的选项节点元素设置为自定义的treecell实现
-        treeView.setCellFactory((TreeView<String> p) ->
-                new TextFieldTreeCellImpl());
+//         //将TreeView对象的选项节点元素设置为自定义的treecell实现
+//        treeView.setCellFactory((TreeView<String> p) ->
+//                new TextFieldTreeCellImpl());
 
         //addTree(filename);
         vb.getChildren().add(treeView);
