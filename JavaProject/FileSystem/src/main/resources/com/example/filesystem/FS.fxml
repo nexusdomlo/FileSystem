@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane fx:id="mainInterface" prefHeight="510.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.filesystem.HelloController">
+    <children>
+        <ImageView fx:id="main_BG" fitHeight="483.0" fitWidth="702.0" pickOnBounds="true" preserveRatio="true">
+
+            <image>
+                <Image url="@../../../main_BG.jpg" />
+            </image>
+        </ImageView>
+        <ImageView fx:id="Tips" fitHeight="40.0" fitWidth="40.0" layoutX="14.0" layoutY="14.0" onMouseClicked="#initIllustrate" pickOnBounds="true" preserveRatio="true">
+            <image>
+                <Image url="@../../../Tips.png" />
+            </image>
+        </ImageView>
+        <ImageView fx:id="aboutUs" fitHeight="40.0" fitWidth="40.0" layoutX="14.0" layoutY="82.0" onMouseClicked="#State" pickOnBounds="true" preserveRatio="true">
+            <image>
+                <Image url="@../../../aboutUs.png" />
+            </image>
+        </ImageView>
+        <ImageView fx:id="fileStorage" fitHeight="40.0" fitWidth="40.0" layoutX="14.0" layoutY="160.0" onMouseClicked="#Store" pickOnBounds="true" preserveRatio="true">
+            <image>
+                <Image url="@../../../Storage.png" />
+            </image>
+        </ImageView>
+        <MenuBar fx:id="startMenuBar" layoutX="-3.0" layoutY="467.0" prefHeight="40.0" prefWidth="40.0">
+            <menus>
+                <Menu mnemonicParsing="false">
+                    <items>
+                        <MenuItem fx:id="menuItem1" mnemonicParsing="false" text="关于我们" />
+                        <MenuItem fx:id="menuItem2" mnemonicParsing="false" text="存储" />
+                        <MenuItem fx:id="menuItem3" mnemonicParsing="false" text="帮助" />
+                        <MenuItem fx:id="menuItem4" mnemonicParsing="false" text="关机" />
+                    </items>
+                    <graphic>
+                        <ImageView fx:id="startMenu" fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
+                            <image>
+                                <Image url="@../../../Menu.png" />
+                            </image>
+                        </ImageView>
+                    </graphic>
+                </Menu>
+            </menus>
+        </MenuBar>
+    </children></AnchorPane>
