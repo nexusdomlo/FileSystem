@@ -166,16 +166,22 @@ public class HelloController {
         VBox vb = new VBox();
         vb.setPrefHeight(600);
         root.setExpanded(true);
-        TreeView tree = new TreeView(root);
-        tree.setMaxWidth(100.0D);
-        tree.setMaxHeight(500.0D);
-        tree.setLayoutX(0);
-        tree.setLayoutY(0);
-        tree.setEditable(true);
+        TreeView treeView = new TreeView(root);
+        treeView.setMaxWidth(100.0D);
+        treeView.setMaxHeight(550.0D);
+        treeView.setLayoutX(0);
+        treeView.setLayoutY(0);
+        treeView.setEditable(true);
+         //将TreeView对象的选项节点元素设置为自定义的treecell实现
+        treeView.setCellFactory((TreeView<String> p) ->
+                new TextFieldTreeCellImpl());
+
         //addTree(filename);
-        vb.getChildren().add(tree);
+        vb.getChildren().add(treeView);
+        ScrollPane sp = new ScrollPane(vb);
+        sp.setMaxHeight(550);
         commandPane.getChildren().add(vb);
-        addRightMenu(tree);
+        addRightMenu(treeView);
 
         //Disk区域
         HBox hb = new HBox();
@@ -183,7 +189,7 @@ public class HelloController {
         l.setFont(Font.font("Time New Roman",15));
         hb.getChildren().add(l);
         hb.setLayoutY(2);
-        hb.setLayoutX(100);
+        hb.setLayoutX(130);
         Pane dp =new Pane();
         dp.getChildren().add(hb);
         dp.setLayoutX(80);
@@ -235,12 +241,10 @@ public class HelloController {
 
         //输入指令部分
         //单行输入框
-        Pane hbPane = new Pane();
+
         HBox hbox = new HBox();
         Label label = new Label("ROOT:>");
         //label.setPadding(15,15,20,20);
-        hbox.setLayoutX(180);
-        hbox.setLayoutY(340);
         TextField field = new TextField();
          //设置单行输入框的宽高
         field.setPrefSize(150,20);
@@ -253,7 +257,11 @@ public class HelloController {
          //设置单行输入框的推荐列数
         field.setPrefColumnCount(11);
         hbox.getChildren().addAll(label,field);
-        hbPane.getChildren().add(hbox);
+        ScrollPane hbPane = new ScrollPane(hbox);
+        hbPane.setLayoutX(180);
+        hbPane.setLayoutY(340);
+        hbPane.setMaxHeight(120.0D);
+        hbPane.setMinWidth(100.0D);
         commandPane.getChildren().add(hbPane);
 
 
@@ -430,6 +438,15 @@ public class HelloController {
         folderStage.show();
     }
 
+    public final class TextFieldTreeCellImpl extends TreeCell<String>{
+        private final ContextMenu folderMenu = new ContextMenu();
+        private final ContextMenu fileMenu = new ContextMenu();
+        private final ContextMenu rootMenu = new ContextMenu();
+
+        public TextFieldTreeCellImpl(){
+
+        }
+    }
 
 
 }
