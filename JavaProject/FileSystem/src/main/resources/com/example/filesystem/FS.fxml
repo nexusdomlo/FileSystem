@@ -11,30 +11,30 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane fx:id="mainInterface" prefHeight="510.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.filesystem.HelloController">
+<AnchorPane fx:id="mainInterface" prefHeight="1000.0" prefWidth="1400.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.filesystem.HelloController">
     <children>
-        <ImageView fx:id="main_BG" fitHeight="483.0" fitWidth="702.0" pickOnBounds="true" preserveRatio="true">
+        <ImageView fx:id="main_BG" fitHeight="960.0" fitWidth="1600.0" pickOnBounds="true" preserveRatio="true">
 
             <image>
                 <Image url="@../../../main_BG.jpg" />
             </image>
         </ImageView>
-        <ImageView fx:id="Tips" fitHeight="40.0" fitWidth="40.0" layoutX="14.0" layoutY="14.0" onMouseClicked="#initIllustrate" pickOnBounds="true" preserveRatio="true">
+        <ImageView fx:id="Tips" fitHeight="40.0" fitWidth="40.0" layoutX="10.0" layoutY="10.0" onMouseClicked="#initIllustrate" pickOnBounds="true" preserveRatio="true">
             <image>
                 <Image url="@../../../Tips.png" />
             </image>
         </ImageView>
-        <ImageView fx:id="aboutUs" fitHeight="40.0" fitWidth="40.0" layoutX="14.0" layoutY="82.0" onMouseClicked="#State" pickOnBounds="true" preserveRatio="true">
+        <ImageView fx:id="aboutUs" fitHeight="40.0" fitWidth="40.0" layoutX="10.0" layoutY="75.0" onMouseClicked="#State" pickOnBounds="true" preserveRatio="true">
             <image>
                 <Image url="@../../../aboutUs.png" />
             </image>
         </ImageView>
-        <ImageView fx:id="fileStorage" fitHeight="40.0" fitWidth="40.0" layoutX="14.0" layoutY="160.0" onMouseClicked="#Store" pickOnBounds="true" preserveRatio="true">
+        <ImageView fx:id="fileStorage" fitHeight="40.0" fitWidth="40.0" layoutX="10.0" layoutY="140.0" onMouseClicked="#Store" pickOnBounds="true" preserveRatio="true">
             <image>
                 <Image url="@../../../Storage.png" />
             </image>
         </ImageView>
-        <MenuBar fx:id="startMenuBar" layoutX="-3.0" layoutY="467.0" prefHeight="40.0" prefWidth="40.0">
+        <MenuBar fx:id="startMenuBar" layoutX="6.0" layoutY="960.0" prefHeight="40.0" prefWidth="40.0">
             <menus>
                 <Menu mnemonicParsing="false">
                     <items>
@@ -53,4 +53,7 @@
                 </Menu>
             </menus>
         </MenuBar>
+      <Label layoutX="19.0" layoutY="55.0" text="提示" />
+      <Label layoutX="19.0" layoutY="120.0" text="帮助" />
+      <Label layoutX="19.0" layoutY="185.0" text="系统" />
     </children></AnchorPane>

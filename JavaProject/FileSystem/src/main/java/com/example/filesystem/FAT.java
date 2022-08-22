@@ -1,7 +1,5 @@
 package com.example.filesystem;
 
-import java.util.ArrayList;
-
 public class FAT {
     public int[] IndexArray;
     public FAT()

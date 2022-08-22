@@ -10,7 +10,7 @@ public class Folder {
     String path;//路径
     ArrayList<Object>children;//孩子节点
     int type;//记录目录属性
-    ArrayList<String>item;//用字符来直接记录目录项，方便观察
+    ArrayList<String>item=new ArrayList<>();//用字符来直接记录目录项，方便观察
  
     public Folder(String folderName,String path,int num,Folder parent)
     {
@@ -26,7 +26,8 @@ public class Folder {
         {
             item.add("$       ");//初始化的过程，添加8个$，就是八个空目录项
         }
-        FileSub.Disk.blocks[index].BlockChange(-1,this,true);//第一次创建begin的值都是true，以后添加的时候才需要更改，每个目录只能占有1个盘，所以begin永远是true
+        /*FileSub.Disk.blocks[index].BlockChange(-1,this,true);//第一次创建begin的值都是true，以后添加的时候才需要更改，每个目录只能占有1个盘，所以begin永远是true*/
+        //新建的位置已经有一个了不需要，而且会报错
     }
     public void addChildrenNode(Object object)//用于添加孩子节点的函数
     {

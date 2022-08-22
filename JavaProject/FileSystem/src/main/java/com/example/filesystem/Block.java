@@ -17,10 +17,6 @@ public class Block {
     void setObject(Object object)
     {
         this.object=object;
-/*        if(object instanceof File)//属于文件类
-        {
-
-        }*/
     }
     public void BlockChange(int index,Object object,boolean begin)//第一个数据是本磁盘块所对应的下一个磁盘块的索引，第二个是类，第三个就是表示这个是不是第一块
     {

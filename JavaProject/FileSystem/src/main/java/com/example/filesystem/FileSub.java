@@ -23,12 +23,28 @@ public class FileSub {
         }
         return -1;
     }
+    public static void findFolder(String p)//输入路径寻找文件
+    {
+        for(int i=2;i<128;i++)
+        {
+            if(Disk.blocks[i].object==null)
+                return;
+            if(Disk.blocks[i].object.getClass().toString().equals("com.example.filesystem.Folder"))
+            {
+                if(p.equals(((Folder)Disk.blocks[i].object).path))
+                {
+                    FileSub.F=(Folder)Disk.blocks[i].object;
+                }
+            }
+        }
+    }
+
     public static boolean open_file(String fileName,int operatetype)//一个是文件名，一个是操作类型  返回的是是否已经打开的提示，如果找不到文件就返回false
     {
         //operatetype中0代表写操作，1代表读操作
         for(int i=0;i<8;i++)
         {
-           if((F.item.get(i).substring(0,3)).equals(fileName))
+           if((F.item.get(i).substring(0,3)).equals(fileName))//找到对应的文件
            {
                if(((File)F.children.get(i)).type%2==1)
                {
@@ -196,7 +212,7 @@ public class FileSub {
         }
         return false;//目录不存在
     }
-    public static boolean change(String filename,int type)
+    public static boolean change(String filename,String t)
     {
         for(int i=0;i<F.item.size();i++)
         {
@@ -206,7 +222,10 @@ public class FileSub {
                     if(Disk.filesOpened.get(j).path.equals(currentpath+"\\"+filename))
                         return false;
                 File file=(File)F.children.get(i);
-                file.type=type;//更改文件的属性
+                if(t.equals("OR"))
+                    file.type=1;
+                else
+                    file.type=0;//更改文件的属性
                 /*然后就是将file中的各项信息展示出来*/
             }
         }
