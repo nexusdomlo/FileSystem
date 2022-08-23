@@ -78,7 +78,6 @@ public class HelloController {
         TextArea text = new TextArea("命令类型：操作类型 目录名\\文件名\n          默认最初的目录为根目录\n          命令中，最后的指令名字前带$指类型是目录 例如 create a\\$b 在a目录下创建b目录\n                                                  create a\\b 在目录下创建b文件 \n          改变文件属性中OR为只读 RAW为读与写 例如 change a.OR 改为只读 \n                                                  change a.RAW 改为读与写 \n                                 创建出来的文件默认是读与写 不支持文件夹属性改变 \n创建命令：create \n          例子 创建文件：create a        在b文件夹中创建文件 create b\\a \n            创建文件夹：create $c       在文件夹中创建文件夹 create b\\$c \n打开命令：open\n          例子 打开文件：open a        打开文件夹下的文件 open b\\a\n            打开文件夹：open $c       打开文件夹下的文件夹 open b\\$c\n\n关闭命令：close\n          例子 关闭文件：close a       关闭文件夹下的文件 close b\\a\n            关闭文件夹：close $c      关闭文件夹下的文件夹 close b\\$c\n\n以下命令列子相似\n\n删除命令：delete\n\n查询命令：search\n\n改变文件属性命令（只支持文件类型）：change\n                                    例如 change a.OR 改为只读\n                                        change a.RAW 改为读与写 \n\t\t\t\t创建出来的文件默认是读与写 不支持文件夹属性改变\n");
         gp.getChildren().add(text);
 
-
         helpStage.show();
     }
 
@@ -299,6 +298,10 @@ public class HelloController {
                             boolean is=FileSub.open_file(orderString[1],0);//以读写的操作来打开文件，后端数据层面
                             System.out.println(is);
                         }
+                        else
+                        {
+                            openfolder(orderString[1].substring(1));//执行打开文件的操作
+                        }
                     }
                     else if(orderString[0].equals("create"))
                     {
@@ -360,8 +363,30 @@ public class HelloController {
     public void openfolder(String foldername)
     {
         Pane filePane=new Pane();
-        for(int i=0;i<FileSub.F.item.size();i++)
+        for(int i=0;i<FileSub.F.children.size();i++)
         {
+            if(FileSub.F.children.get(i) instanceof File)//如果他属于文件类
+            {
+                Image fl=new Image("Txt.png");
+                ImageView FIV=new ImageView();
+                FIV.setImage(fl);
+                Label FLname=new Label(((File)FileSub.F.children.get(i)).fileName);
+                FIV.setLayoutX(15.0+i*30);
+                FIV.setLayoutY(10);
+                filePane.getChildren().add(FIV);
+                filePane.getChildren().add(FLname);
+            }
+            else if(FileSub.F.children.get(i) instanceof Folder){
+                Image fl=new Image("File.png");
+                ImageView FIV=new ImageView();
+                FIV.setImage(fl);
+                Label FLname=new Label(((Folder)FileSub.F.children.get(i)).folderName);
+                FIV.setLayoutX(15.0+i*30);
+                FIV.setLayoutY(10);
+                filePane.getChildren().add(FIV);
+                filePane.getChildren().add(FLname);
+            }
+            //设置文件图片和标签的位置
         }
         Scene fileScene = new Scene(filePane,800,600);//设置窗口的大小
         Stage fileStage = new Stage();
@@ -593,6 +618,7 @@ public class HelloController {
                 FileSub.currentpath=printcurrent();//获取对应的当前路径
                 FileSub.findFolder(FileSub.currentpath);//修改当前路径下的所在的文件夹
                 File X=new File(filename,FileSub.currentpath+"\\"+filename,index,FileSub.F,0,1);
+                FileSub.F.addChildrenNode(X);//当前的文件夹数据添加文件节点
                 FileSub.Disk.blocks[index].BlockChange(-1,X,true);//更改对应的磁盘块的内容
                 FileSub.FatTable.IndexArray[index]=-1;//修改FAT表
                 //对后端数据的修改
@@ -693,7 +719,7 @@ public class HelloController {
                 //对后端数据的修改
 
                 FileSub.currentpath=printcurrent();
-                System.out.println(FileSub.currentpath);
+/*                System.out.println(FileSub.currentpath);*/
                 folderStage.close();//关闭窗口
             }
         });
@@ -706,7 +732,7 @@ public class HelloController {
             }
         });
     }
-    public String  printcurrent()
+    public String  printcurrent()//获取当前路径
     {
         String road = "ROOT";
         for(TreeItem<Pane> it=item;!((Label)it.getValue().getChildren().get(0)).getText().equals("ROOT");it=it.getParent())
