@@ -197,7 +197,7 @@ public class FileSub {
         }
         return false;
     }
-    public static boolean typefile(String filename)
+    public static File typefile(String filename)
     {
         for(int i=0;i<F.item.size();i++)
         {
@@ -205,12 +205,13 @@ public class FileSub {
             {
                 for(int j=0;j<Disk.filesOpened.size();j++)
                     if(Disk.filesOpened.get(j).path.equals(currentpath+"\\"+filename))
-                        return false;
+                        return null;
                 File file=(File)F.children.get(i);
+                return file;
                 /*然后就是将file中的各项信息展示出来*/
             }
         }
-        return false;//目录不存在
+        return null;//目录不存在
     }
     public static boolean change(String filename,String t)
     {

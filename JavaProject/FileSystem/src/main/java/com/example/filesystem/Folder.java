@@ -43,6 +43,7 @@ public class Folder {
             String itemString=((Folder) object).folderName+"  "+((Folder) object).type+((Folder) object).num+0;
             item.set(children.size()-1,itemString);
         }
+        size=size+8;//每次添加一个孩子节点就大小加8
     }
 
 

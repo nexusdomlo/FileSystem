@@ -243,11 +243,11 @@ public class HelloController {
             numberBox.getChildren().add(stackPane);
         }
     }
+    public AnchorPane Writebox = new AnchorPane();//用AnchorPane设置输入栏的文字和位置
     public  void Writefield(double x,double y,Pane commandPane)
     {
         //输入指令部分
         //单行输入框
-        AnchorPane Writebox = new AnchorPane();//用AnchorPane设置输入栏的文字和位置
         Label label = new Label("ROOT:\\>");
         Label mingningLabel=new Label("命令行");
         mingningLabel.setPrefSize(50,0);
@@ -307,7 +307,7 @@ public class HelloController {
                     {
                         if(orderString[1].charAt(0)!='$')//操作的是文件
                         {
-                            createFile();
+                            createFile();//弹出弹框进行操作
                         }
                         else{
                             createFolder();
@@ -319,18 +319,45 @@ public class HelloController {
                         {
                             FileSub.close_file(orderString[1]);
                         }
+                        //没有close文件夹的操作
                     }
                     else if(orderString[0].equals("delete"))
                     {
                         if(orderString[1].charAt(0)!='$')//操作的是文件
                         {
                             FileSub.delete_file(orderString[1]);
+                            deletefile();
                         }
                         else{
-                            FileSub.removedir(orderString[1]);
+                            FileSub.removedir(orderString[1].substring(1));
+                            deletefile();
                         }
                     }
                     else if(orderString[0].equals("search")) {
+                        if(orderString[1].charAt(0)!='$')//操作的是文件
+                        {
+                            File X=FileSub.typefile(orderString[1]);
+                            Label exist=new Label("---存在文件"+orderString[1]+"---");
+                            if(X==null)
+                            {
+                                exist=new Label("---不存在文件"+orderString[1]+"---");
+                                exist.setPrefSize(50,0);
+                                Writebox.getChildren().add(exist);
+                                AnchorPane.setTopAnchor(exist,30.0+Writebox.getChildren().size()*50);
+                                return;
+                            }
+                            Label filetype=new Label("文件类型:"+X.type);
+                            Label filesize=new Label("文件大小"+X.size);
+                            Writebox.getChildren().add(exist);
+                            AnchorPane.setTopAnchor(exist,30.0+Writebox.getChildren().size()*50);
+                            Writebox.getChildren().add(filetype);
+                            AnchorPane.setTopAnchor(filetype,30.0+Writebox.getChildren().size()*50);
+                            Writebox.getChildren().add(filesize);
+                            AnchorPane.setTopAnchor(filesize,30.0+Writebox.getChildren().size()*50);
+                        }
+                        else{
+
+                        }
 
                     }
                     else if(orderString[0].equals("change"))
@@ -346,6 +373,12 @@ public class HelloController {
             }
         });
     }
+    public void deletefile()
+    {
+        TreeItem<Pane> Par=item.getParent();
+        Par.getChildren().remove(item);
+    }
+
     public void openfile(String filename)
     {
         Pane filePane=new Pane();
@@ -412,6 +445,7 @@ public class HelloController {
                 @Override
                 public void handle(ActionEvent actionEvent) {
                     FileSub.delete_file(name);
+                    deletefile();
                 }
             });
             MenuItem filetypeItem=new MenuItem("属性");
@@ -439,7 +473,8 @@ public class HelloController {
             folderdeleteItem.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(ActionEvent actionEvent) {
-                    System.out.println("shanchu");
+                    FileSub.removedir(((Label)item.getValue().getChildren().get(0)).getText());//点击删除按钮后执行remove和delete函数
+                    deletefile();
                 }
             });
             MenuItem foldertypeItem = new MenuItem("属性");
@@ -618,7 +653,7 @@ public class HelloController {
                 FileSub.currentpath=printcurrent();//获取对应的当前路径
                 FileSub.findFolder(FileSub.currentpath);//修改当前路径下的所在的文件夹
                 File X=new File(filename,FileSub.currentpath+"\\"+filename,index,FileSub.F,0,1);
-                FileSub.F.addChildrenNode(X);//当前的文件夹数据添加文件节点
+                FileSub.F.addChildrenNode(X);//当前的文件夹数据添加文件节点，并更新数据
                 FileSub.Disk.blocks[index].BlockChange(-1,X,true);//更改对应的磁盘块的内容
                 FileSub.FatTable.IndexArray[index]=-1;//修改FAT表
                 //对后端数据的修改
@@ -714,10 +749,8 @@ public class HelloController {
                 TreeItem<Pane> newItem=new TreeItem<>(make_Pane(filename,false));
                 newItem.setExpanded(true);
                 item.getChildren().add(newItem);
-
                 FileSub.mkdir(filename);
                 //对后端数据的修改
-
                 FileSub.currentpath=printcurrent();
 /*                System.out.println(FileSub.currentpath);*/
                 folderStage.close();//关闭窗口

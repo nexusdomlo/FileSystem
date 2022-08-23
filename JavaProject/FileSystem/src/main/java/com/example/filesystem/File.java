@@ -1,5 +1,7 @@
 package com.example.filesystem;
 
+import java.io.UnsupportedEncodingException;
+
 public class File {
     String fileName;//文件名
     int flag;//只读/读写标志
@@ -18,7 +20,7 @@ public class File {
         this.parent=parent;
         this.content="";
         this.open=false;
-        this.size=0;
+        this.size=0;//初始化为占用
         this.type=type;
         this.flag=flag;
         disk D=FileSub.Disk;
@@ -28,7 +30,10 @@ public class File {
     }
 
 
-    public void changeFileContent(String content)//从前段里面提取相应的字符串
-    {}
+    public void changeFileContent(String content) throws UnsupportedEncodingException//从前段里面提取相应的字符串
+    {
+        this.content=content;//更改对应的字符串
+        size=content.getBytes("gbk").length;
+    }
 
 }
