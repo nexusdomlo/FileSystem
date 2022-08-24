@@ -7,7 +7,7 @@ public class FileSub {
     public static FAT FatTable=new FAT();
     public static disk Disk=new disk();
     public static Folder F=Disk.root;//记录当前所在文件夹的变量，一般初始化为根目录
-    public static String currentpath;//记录当前路径的变量
+    public static String currentpath;//记录当前路径的变量 这个路径指的是当前在输入文字栏显示的路径
     public static char[] buffer1=new char[64];
     public static char[] buffer2=new char[64];
     /*双缓冲是第一个缓冲区读入数据完成时第二个缓冲区开始工作，读入用户区结束后判断第一个缓冲区是否停止工作，如果停止工作那继续向第一个缓冲读入数据。*/
@@ -23,21 +23,40 @@ public class FileSub {
         }
         return -1;
     }
-    public static void findFolder(String p)//输入路径寻找文件
+    public static boolean findFolder(String p)//输入路径寻找文件
     {
         for(int i=2;i<128;i++)
         {
             if(Disk.blocks[i].object==null)
-                return;
-            if(Disk.blocks[i].object.getClass().toString().equals("com.example.filesystem.Folder"))
+                return false;
+            if(Disk.blocks[i].object.getClass().toString().equals("class com.example.filesystem.Folder"))
             {
                 if(p.equals(((Folder)Disk.blocks[i].object).path))
                 {
                     FileSub.F=(Folder)Disk.blocks[i].object;
+                    return true;
                 }
             }
         }
+        return false;
     }
+    public static File findfile(String p)
+    {
+        for(int i=2;i<128;i++)
+        {
+            if(Disk.blocks[i].object==null)
+                continue;
+            if(Disk.blocks[i].object.getClass().toString().equals("class com.example.filesystem.File"))
+            {
+                if(p.equals(((File)Disk.blocks[i].object).path))
+                {
+                   return (File)Disk.blocks[i].object;
+                }
+            }
+        }
+        return null;
+    }
+
 
     public static boolean open_file(String fileName,int operatetype)//一个是文件名，一个是操作类型  返回的是是否已经打开的提示，如果找不到文件就返回false
     {
@@ -164,12 +183,6 @@ public class FileSub {
         {
             if(Disk.filesOpened.get(i).path.equals(currentpath+"\\"+filename))
             {
-                //找到对应的文件
-/*                if(Disk.filesOpened.get(i).operatetype==0)//如果操作为写操作作为打开方式的
-                {
-
-
-                }*/
                 File file=(File)Disk.blocks[Disk.filesOpened.get(i).begin].object;
                 file.open=false;//将文件的open属性更改
                 Disk.filesOpened.remove(i);//从已打开文件表中删除
@@ -177,21 +190,45 @@ public class FileSub {
             }
         }
     }
+    public static boolean delete_pathfile(String path)
+    {
+        File file=findfile(path);
+        int pos=0;
+        for(int index=file.num;index!=-1;index=pos)
+        {
+            pos=FatTable.IndexArray[index];
+            Disk.blocks[index].BlockChange(0,null,true);//不断的迭代然后更新磁盘块 ，归还磁盘块
+            FatTable.IndexArray[index]=0;
+        }
+        for(int i=0;i<file.parent.item.size();i++)
+        {
+            if(file.parent.item.get(i).split("\\.")[0].equals(file.fileName)) {
+                file.parent.item.remove(i);
+                file.parent.children.remove(i);
+                return true;
+            }
+        }
+        return false;
+    }
     public static boolean delete_file(String filename)
     {
         for(int i=0;i<F.item.size();i++)
         {
-            if(F.item.get(i).substring(0,3).equals(filename))
+            if(F.item.get(i).split("\\.")[0].equals(filename))
             {
                 for(int j=0;j<Disk.filesOpened.size();j++)
                     if(Disk.filesOpened.get(j).path.equals(currentpath+"\\"+filename))
                         return false;//如果打开就返回操作失败
                 File file = (File) (F.children.get(i));
-                for(int index=file.num;index!=-1;index=FatTable.IndexArray[index])
+                int pos=0;
+                for(int index=file.num;index!=-1;index=pos)
                 {
+                    pos=FatTable.IndexArray[index];
                     Disk.blocks[index].BlockChange(0,null,true);//不断的迭代然后更新磁盘块 ，归还磁盘块
+                    FatTable.IndexArray[index]=0;
                 }
                 F.item.remove(i);//删除目录项
+                F.children.remove(i);//删除对应的孩子节点
                 return true;//操作成功
             }
         }
@@ -201,11 +238,14 @@ public class FileSub {
     {
         for(int i=0;i<F.item.size();i++)
         {
-            if(F.item.get(i).equals(filename))
+            String name=F.item.get(i).split("\\.")[0];
+            if(name.equals(filename))
             {
+/*                if(Disk.filesOpened==null)
+                    return null;
                 for(int j=0;j<Disk.filesOpened.size();j++)
                     if(Disk.filesOpened.get(j).path.equals(currentpath+"\\"+filename))
-                        return null;
+                        return null;*///search不需要打开
                 File file=(File)F.children.get(i);
                 return file;
                 /*然后就是将file中的各项信息展示出来*/
@@ -243,18 +283,18 @@ public class FileSub {
         FatTable.IndexArray[index]=-1;
         return true;
     }
-    public static boolean showdir(String Foldername)
+    public static Folder showdir(String Foldername)
     {
         for(int i=0;i<F.item.size();i++)
         {
-            if(F.item.get(i).substring(0,3).equals(Foldername))//有同名目录
+
+            if(F.item.get(i).split(" ")[0].equals(Foldername))//有同名目录
             {
-                /*展示内容*/
-                return true;
+                return (Folder)F.children.get(i);
             }
 
         }
-        return false;
+        return null;
     }
     public static boolean removedir(String Foldername)
     {

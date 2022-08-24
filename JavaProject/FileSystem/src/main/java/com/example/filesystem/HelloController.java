@@ -3,7 +3,6 @@ package com.example.filesystem;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
@@ -25,12 +24,15 @@ import javafx.scene.text.Text;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
+import java.io.UnsupportedEncodingException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 public class HelloController {
-    @FXML
+/*    @FXML
     private ImageView aboutUs;
 
     @FXML
@@ -53,20 +55,18 @@ public class HelloController {
 
     @FXML
     private MenuItem menuItem2;
-
     @FXML
-    private MenuItem menuItem4;
+    private ImageView Tips;
+    @FXML
+    private MenuItem menuItem4;*/
 
     @FXML
     private AnchorPane mainInterface;
     public TreeItem<Pane> item;
-    @FXML
-    private ImageView Tips;
     //帮助按钮点击事件
     @FXML
-    void initIllustrate(MouseEvent event) {
+    void initIllustrate() {
         //滚动面板
-        VBox vb = new VBox();
         Group gp = new Group();
         Scene scene = new Scene(gp,520,200);
         Stage helpStage = new Stage();
@@ -83,7 +83,7 @@ public class HelloController {
 
     //关于我们按钮点击事件
     @FXML
-    void State(MouseEvent event) {
+    void State() {
         Pane commandPane = new Pane();
         Stage aboutStage = new Stage();
         Scene scene = new Scene(commandPane,400,300);
@@ -94,12 +94,10 @@ public class HelloController {
         textarea.setFont(Font.font(5));
         //加粗
         textarea.setStyle("-fx-font-weight:bold");
-        //textarea.setStyle("-fx-font-size:10");
         //自动换行
         textarea.setWrapText(true);
         //初始化设置行数
         textarea.setPrefRowCount(20);
-        //textarea.setText("setText");
         commandPane.getChildren().add(textarea);
         //窗口不可拉伸
         aboutStage.setResizable(false);
@@ -136,11 +134,18 @@ public class HelloController {
     }
     public static void addPie(double x,double y,Pane commandPane)
     {
+        int count=0;
+        for(int i=0;i< FileSub.FatTable.IndexArray.length;i++)
+        {
+            if(FileSub.FatTable.IndexArray[i]!=0)
+                count++;
+        }
+        DecimalFormat df=new DecimalFormat("0.0");//控制小数点之后的位数
         //饼图
         ObservableList<PieChart.Data> pieChartData =
                 FXCollections.observableArrayList(
-                        new PieChart.Data("已使用",20),
-                        new PieChart.Data("未使用",80));
+                        new PieChart.Data("已使用"+df.format(count*100.0/128),count*100.0/128),
+                        new PieChart.Data("未使用"+df.format(100.0-count*100.0/128),100.0-count*100.0/128));
         PieChart pieChart = new PieChart(pieChartData);
         //设置标签不可见
         pieChart.setLabelsVisible(false);
@@ -152,11 +157,11 @@ public class HelloController {
         pieChart.setStartAngle(90);
         commandPane.getChildren().add(pieChart);
     }
-    public static void addDiskUsing(double x,double y,Pane commandPane)
+    public GridPane myPane = new GridPane();
+    public void addDiskUsing(double x,double y,Pane commandPane)
     {
         //diskUsing区域
         List<StackPane> disk = new ArrayList();
-        GridPane myPane = new GridPane();
         myPane.setStyle("-fx-background-color: #fff");
         myPane.setVgap(3.0D); //两个格子之间的垂直距离
         myPane.setHgap(3.0D); //两个格子之间的水平距离
@@ -168,12 +173,6 @@ public class HelloController {
             StackPane stackPane = new StackPane();
             stackPane.getChildren().add(numberLabel);
             stackPane.setStyle("-fx-background-color: #c8c8c8");
-            final Text text = (Text)stackPane.getChildren().get(0);
-            stackPane.setOnMouseClicked(new EventHandler<Event>() {
-                public void handle(Event arg0) {
-                    System.out.println("点击" + text.getText() + "号块");
-                }
-            });
             disk.add(i, stackPane);
             myPane.add(stackPane, i % 8, i / 8);
         }
@@ -181,11 +180,21 @@ public class HelloController {
         myPane.setLayoutX(x);
         commandPane.getChildren().add(myPane);
     }
+    public void changeDiskusing()
+    {
+        for(int i = 0; i < 128; ++i) {
+            StackPane X=(StackPane) myPane.getChildren().get(i);
+            if(FileSub.Disk.blocks[i].object!=null)
+                X.setStyle("-fx-background-color: #00ff00");
+            else
+                X.setStyle("-fx-background-color: #c8c8c8");
 
+        }
+    }
+    Pane commandPane = new Pane();
     //存储按钮
     @FXML
     void Store(MouseEvent event) {
-        Pane commandPane = new Pane();
         Scene scene = new Scene(commandPane,1000,800);//750的宽度，550的高度
         Stage startStage = new Stage();
         startStage.setScene(scene);
@@ -196,24 +205,28 @@ public class HelloController {
         //Disk
         addDisk(400,450,commandPane);
         addPie(250,580,commandPane);
-//饼图部分
+        //饼图部分
         addDiskUsing(450,480,commandPane);
         //输入指令部分
+        Writebox.getChildren().clear();
         Writefield(260,0,commandPane);
         addFAT(780,0,commandPane);
         startStage.show();
+        FileSub.currentpath="ROOT";
+        changeDiskusing();
+        changeFAT();
     }
-    public static void addFAT(double x,double y,Pane commandPane)
+    public VBox numberBox = new VBox();
+    public VBox contentBox = new VBox();
+    public void addFAT(double x,double y,Pane commandPane)
     {
         //FAT表
-        VBox numberBox = new VBox();
-        VBox contentBox = new VBox();
         Label[] numberLabel = new Label[128];
         Label[] contentLabel = new Label[128];
         HBox hBox = new HBox(new Node[]{numberBox, contentBox});
         hBox.setSpacing(5.0D);
         ScrollPane scrollPane = new ScrollPane(hBox);
-        scrollPane.setMaxHeight(520.0D);
+        scrollPane.setMaxHeight(750.0D);
         scrollPane.setMinWidth(100.0D);
         Text fatTitle = new Text("FAT表");
         fatTitle.setFont(Font.font(15.0D));
@@ -243,20 +256,24 @@ public class HelloController {
             numberBox.getChildren().add(stackPane);
         }
     }
-    public AnchorPane Writebox = new AnchorPane();//用AnchorPane设置输入栏的文字和位置
-    public  void Writefield(double x,double y,Pane commandPane)
+    public void changeFAT()
     {
-        //输入指令部分
-        //单行输入框
-        Label label = new Label("ROOT:\\>");
-        Label mingningLabel=new Label("命令行");
-        mingningLabel.setPrefSize(50,0);
+        for(int i = 0; i < 128; ++i) {
+            StackPane stackPane=(StackPane) contentBox.getChildren().get(i);
+            ((Label)stackPane.getChildren().get(0)).setText(String.valueOf(FileSub.FatTable.IndexArray[i]));
+            if(FileSub.FatTable.IndexArray[i]!=0)
+                stackPane.setStyle("-fx-background-color: #00ff00");
+            else
+                stackPane.setStyle("-fx-background-color: #c8c8c8");
+        }
+    }
 
-        label.setPrefSize(50,20);//设置文字的大小
+    public AnchorPane Writebox = new AnchorPane();//用AnchorPane设置输入栏的文字和位置
+    public void setfieldPane()
+    {
         TextField field = new TextField();
-
         //设置单行输入框的宽高
-        field.setPrefSize(150,20);
+        field.setPrefSize(150,10);
         //能否编辑
         field.setEditable(true);
         //单行输入框的提示语
@@ -265,25 +282,9 @@ public class HelloController {
         field.setAlignment(Pos.CENTER_LEFT);
         //设置单行输入框的推荐列数
         field.setPrefColumnCount(11);
-        Button bangzhu=new Button("提示");
-
-        Writebox.getChildren().add(label);
         Writebox.getChildren().add(field);
-        Writebox.getChildren().add(bangzhu);
-        Writebox.getChildren().add(mingningLabel);
-
-        AnchorPane.setLeftAnchor(mingningLabel,200.0);
-        AnchorPane.setTopAnchor(mingningLabel,0.0);
-        AnchorPane.setLeftAnchor(bangzhu,450.0);
-        AnchorPane.setTopAnchor(bangzhu,0.0);
-
-        AnchorPane.setLeftAnchor(label,0.0);
-        AnchorPane.setTopAnchor(label,30.0);
         AnchorPane.setLeftAnchor(field,50.0);
-        AnchorPane.setTopAnchor(field,30.0);//设置添加的两个元素在Anchorpane中的位置
-        Writebox.setLayoutX(x);
-        Writebox.setLayoutY(y);//设置整一个输入栏（包括文字和输入文字框）的位置
-        commandPane.getChildren().add(Writebox);
+        AnchorPane.setTopAnchor(field,7.0+(Writebox.getChildren().size()-3)*20);//设置添加的两个元素在Anchorpane中的位置
         field.setOnKeyPressed(new EventHandler<KeyEvent>() {//在文本输入栏中回车接受信息
             @Override
             public void handle(KeyEvent keyEvent) {
@@ -294,13 +295,41 @@ public class HelloController {
                     {
                         if(orderString[1].charAt(0)!='$')//操作的是文件
                         {
-                            openfile(orderString[1]);
-                            boolean is=FileSub.open_file(orderString[1],0);//以读写的操作来打开文件，后端数据层面
-                            System.out.println(is);
+                            File X=FileSub.findfile(FileSub.currentpath+"\\"+orderString[1]);//在输入端只能通过当前位置来查找
+                            if(X!=null)
+                            {
+                                openfile(orderString[1]);
+                                field.setEditable(false);
+                            }
+                            else {
+                                Label exist=new Label("---不存在文件"+orderString[1]+"---");
+                                exist.setPrefSize(400,10);
+                                field.setEditable(false);
+                                Writebox.getChildren().add(exist);
+                                AnchorPane.setTopAnchor(exist,15.0+(Writebox.getChildren().size()-3)*20);
+                                setposLabel();
+                                setfieldPane();
+                            }
                         }
                         else
                         {
-                            openfolder(orderString[1].substring(1));//执行打开文件的操作
+                            boolean exist=FileSub.findFolder(FileSub.currentpath+"\\"+orderString[1].substring(1));
+                            if(!exist)
+                            {
+                                Label labels=new Label("---不存在文件夹"+orderString[1]+"---");
+                                labels.setPrefSize(400,10);
+                                Writebox.getChildren().add(labels);
+                                AnchorPane.setTopAnchor(labels,15.0+(Writebox.getChildren().size()-3)*20);
+                                field.setEditable(false);
+                                setposLabel();
+                                setfieldPane();
+                            }
+                            else
+                            {
+                                openfolder(orderString[1].substring(1));//执行打开文件的操作
+                                field.setEditable(false);
+                            }
+
                         }
                     }
                     else if(orderString[0].equals("create"))
@@ -308,9 +337,15 @@ public class HelloController {
                         if(orderString[1].charAt(0)!='$')//操作的是文件
                         {
                             createFile();//弹出弹框进行操作
+                            field.setEditable(false);
+                            setposLabel();
+                            setfieldPane();
                         }
                         else{
                             createFolder();
+                            field.setEditable(false);
+                            setposLabel();
+                            setfieldPane();
                         }
                     }
                     else if(orderString[0].equals("close"))
@@ -318,6 +353,9 @@ public class HelloController {
                         if(orderString[1].charAt(0)!='$')//操作的是文件
                         {
                             FileSub.close_file(orderString[1]);
+                            field.setEditable(false);
+                            setposLabel();
+                            setfieldPane();
                         }
                         //没有close文件夹的操作
                     }
@@ -326,11 +364,17 @@ public class HelloController {
                         if(orderString[1].charAt(0)!='$')//操作的是文件
                         {
                             FileSub.delete_file(orderString[1]);
-                            deletefile();
+                            delete_file_or_folder();
+                            field.setEditable(false);
+                            setposLabel();
+                            setfieldPane();
                         }
                         else{
                             FileSub.removedir(orderString[1].substring(1));
-                            deletefile();
+                            delete_file_or_folder();
+                            field.setEditable(false);
+                            setposLabel();
+                            setfieldPane();
                         }
                     }
                     else if(orderString[0].equals("search")) {
@@ -338,64 +382,183 @@ public class HelloController {
                         {
                             File X=FileSub.typefile(orderString[1]);
                             Label exist=new Label("---存在文件"+orderString[1]+"---");
+                            exist.setPrefSize(400,10);
                             if(X==null)
                             {
                                 exist=new Label("---不存在文件"+orderString[1]+"---");
-                                exist.setPrefSize(50,0);
                                 Writebox.getChildren().add(exist);
-                                AnchorPane.setTopAnchor(exist,30.0+Writebox.getChildren().size()*50);
-                                return;
+                                AnchorPane.setTopAnchor(exist,15.0+(Writebox.getChildren().size()-3)*20);
+                                setposLabel();
+                                setfieldPane();
                             }
-                            Label filetype=new Label("文件类型:"+X.type);
-                            Label filesize=new Label("文件大小"+X.size);
-                            Writebox.getChildren().add(exist);
-                            AnchorPane.setTopAnchor(exist,30.0+Writebox.getChildren().size()*50);
-                            Writebox.getChildren().add(filetype);
-                            AnchorPane.setTopAnchor(filetype,30.0+Writebox.getChildren().size()*50);
-                            Writebox.getChildren().add(filesize);
-                            AnchorPane.setTopAnchor(filesize,30.0+Writebox.getChildren().size()*50);
+                            else{
+                                Label filetype=new Label("文件类型:"+X.type);
+                                filetype.setPrefSize(400,10);
+                                Label filesize=new Label("文件大小:"+X.size);
+                                filesize.setPrefSize(400,10);
+                                Writebox.getChildren().add(exist);
+                                AnchorPane.setTopAnchor(exist,15.0+(Writebox.getChildren().size()-3)*20);
+                                Writebox.getChildren().add(filetype);
+                                AnchorPane.setTopAnchor(filetype,15.0+(Writebox.getChildren().size()-3)*20);
+                                Writebox.getChildren().add(filesize);
+                                AnchorPane.setTopAnchor(filesize,15.0+((Writebox.getChildren().size()-3))*20);
+                                setposLabel();
+                                setfieldPane();
+                            }
+
                         }
                         else{
+                            Folder X=FileSub.showdir(orderString[1].substring(1));
+                            Label exist=new Label("---存在文件夹"+orderString[1].split("\\.")[0]+"---");
+                            exist.setPrefSize(400,10);
+                            if(X==null)
+                            {
+                                exist=new Label("---不存在文件夹"+orderString[1].split("\\.")[0]+"---");
+                                Writebox.getChildren().add(exist);
+                                AnchorPane.setTopAnchor(exist,15.0+(Writebox.getChildren().size()-3)*20);
+                                setposLabel();
+                                setfieldPane();
 
+                            }
+                            else
+                            {
+                                Label filetype=new Label("文件类型:"+X.type);
+                                filetype.setPrefSize(400,10);
+                                Label filesize=new Label("文件大小:"+X.size);
+                                filesize.setPrefSize(400,10);
+                                Writebox.getChildren().add(exist);
+                                AnchorPane.setTopAnchor(exist,15.0+(Writebox.getChildren().size()-3)*20);
+                                Writebox.getChildren().add(filetype);
+                                AnchorPane.setTopAnchor(filetype,15.0+(Writebox.getChildren().size()-3)*20);
+                                Writebox.getChildren().add(filesize);
+                                AnchorPane.setTopAnchor(filesize,15.0+((Writebox.getChildren().size()-3))*20);
+                                setposLabel();
+                                setfieldPane();
+                            }
                         }
-
+                        field.setEditable(false);
+                        setposLabel();
+                        setfieldPane();
                     }
                     else if(orderString[0].equals("change"))
                     {
                         String[] changeorder=orderString[1].split("\\.");
                         FileSub.change(changeorder[0],changeorder[1]);
+                        field.setEditable(false);
+                        setposLabel();
+                        setfieldPane();
+                        //只能够改变文件
+                    }
+                    else if(orderString[0].equals("clear"))
+                    {
+                        Writebox.getChildren().clear();
+                        Writefield(260,0,commandPane);
                     }
                     else
                     {
-                        System.out.println("ERRoR");
+                        Label exist=new Label("---错误的指令，请输入正确的指令---");
+                        exist.setPrefSize(400,10);
+                        Writebox.getChildren().add(exist);
+                        AnchorPane.setTopAnchor(exist,15.0+(Writebox.getChildren().size()-3)*20);
+                        field.setEditable(false);
+                        setposLabel();
+                        setfieldPane();
                     }
+                    changeDiskusing();
+                    changeFAT();
                 }
             }
         });
     }
-    public void deletefile()
+    public void setposLabel()
+    {
+        Label label = new Label("ROOT:\\>");
+        label.setPrefSize(80,13);//设置文字的大小
+        Writebox.getChildren().add(label);
+        AnchorPane.setLeftAnchor(label,0.0);
+        AnchorPane.setTopAnchor(label,10.0+(Writebox.getChildren().size()-2)*20);
+    }
+    public  void Writefield(double x,double y,Pane commandPane)
+    {
+        //输入指令部分
+        //单行输入框
+        Label mingningLabel=new Label("命令行");
+        mingningLabel.setPrefSize(200,0);
+        mingningLabel.setStyle("-fx-font-weight:bold");
+        mingningLabel.setStyle("-fx-font-size:20");
+        Button bangzhu=new Button("提示");
+        Writebox.getChildren().add(bangzhu);
+        Writebox.getChildren().add(mingningLabel);
+        setposLabel();
+        setfieldPane();
+        AnchorPane.setLeftAnchor(mingningLabel,200.0);
+        AnchorPane.setTopAnchor(mingningLabel,0.0);
+        AnchorPane.setLeftAnchor(bangzhu,450.0);
+        AnchorPane.setTopAnchor(bangzhu,0.0);
+
+        ScrollPane scrollPane=new ScrollPane();
+        scrollPane.setContent(Writebox);
+        scrollPane.setLayoutX(x);
+        scrollPane.setLayoutY(y);//设置整一个输入栏（包括文字和输入文字框）的位置
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scrollPane.setPrefSize(510,450);
+        commandPane.getChildren().add(scrollPane);
+
+
+    }
+    public void delete_file_or_folder()
     {
         TreeItem<Pane> Par=item.getParent();
         Par.getChildren().remove(item);
+        changeFAT();
+        changeDiskusing();
     }
 
-    public void openfile(String filename)
-    {
-        Pane filePane=new Pane();
-        TextArea textArea=new TextArea();
-        textArea.setPrefColumnCount(60);
-        textArea.setPrefRowCount(30);
-        textArea.setWrapText(true);
-        filePane.getChildren().add(textArea);
-        Scene fileScene = new Scene(filePane,800,600);//设置窗口的大小
-        Stage fileStage = new Stage();
-        fileStage.setScene(fileScene);
-        fileStage.setTitle(filename);//设置窗口的标题
-        fileStage.show();
+    public void openfile(String filename) {
+        File X=FileSub.findfile(FileSub.currentpath+"\\"+filename);
+        if(X==null) {
+            Label exist=new Label("---存在文件"+filename+"---");
+            exist.setPrefSize(400,10);
+            exist=new Label("---不存在文件"+filename+"---");
+            Writebox.getChildren().add(exist);
+            AnchorPane.setTopAnchor(exist,15.0+(Writebox.getChildren().size()-3)*20);
+            setposLabel();
+            setfieldPane();
+        }
+        else {
+            Pane filePane=new Pane();
+            TextArea textArea=new TextArea();
+            textArea.setText(X.content);
+            textArea.setPrefColumnCount(63);
+            textArea.setPrefRowCount(38);
+            textArea.setWrapText(true);
+            filePane.getChildren().add(textArea);
+            Scene fileScene = new Scene(filePane,800,600);//设置窗口的大小
+            Stage fileStage = new Stage();
+            fileStage.setScene(fileScene);
+            fileStage.setTitle(filename);//设置窗口的标题
+            fileStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+                @Override
+                public void handle(WindowEvent windowEvent) {
+
+                    try {
+                        X.changeFileContent(textArea.getText());
+                        changeFAT();
+                        changeDiskusing();
+                    } catch (UnsupportedEncodingException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            });
+            fileStage.show();
+        }
+
     }
     public void openfolder(String foldername)
     {
         Pane filePane=new Pane();
+
         for(int i=0;i<FileSub.F.children.size();i++)
         {
             if(FileSub.F.children.get(i) instanceof File)//如果他属于文件类
@@ -426,6 +589,7 @@ public class HelloController {
         fileStage.setScene(fileScene);
         fileStage.setTitle(foldername);//设置窗口的标题
         fileStage.show();
+
     }
 
 
@@ -437,6 +601,7 @@ public class HelloController {
             fileopenItem.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(ActionEvent actionEvent) {
+
                     openfile(name);
                 }
             });
@@ -444,15 +609,29 @@ public class HelloController {
             filedeleteItem.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(ActionEvent actionEvent) {
-                    FileSub.delete_file(name);
-                    deletefile();
+                    FileSub.delete_pathfile(printcurrent());
+                    delete_file_or_folder();
                 }
             });
             MenuItem filetypeItem=new MenuItem("属性");
             filetypeItem.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(ActionEvent actionEvent) {
-                    FileSub.typefile(name);
+                    File X=FileSub.typefile(name);
+                    Label exist=new Label("---存在文件"+name+"---");
+                    exist.setPrefSize(400,10);
+                    Label filetype=new Label("文件类型:"+X.type);
+                    filetype.setPrefSize(400,10);
+                    Label filesize=new Label("文件大小:"+X.size);
+                    filesize.setPrefSize(400,10);
+                    Writebox.getChildren().add(exist);
+                    AnchorPane.setTopAnchor(exist,15.0+(Writebox.getChildren().size()-3)*20);
+                    Writebox.getChildren().add(filetype);
+                    AnchorPane.setTopAnchor(filetype,15.0+(Writebox.getChildren().size()-3)*20);
+                    Writebox.getChildren().add(filesize);
+                    AnchorPane.setTopAnchor(filesize,15.0+((Writebox.getChildren().size()-3))*20);
+                    setposLabel();
+                    setfieldPane();
                 }
             });
             getItems().addAll(fileopenItem,filedeleteItem,filetypeItem);
@@ -466,7 +645,7 @@ public class HelloController {
             folderopenItem.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(ActionEvent actionEvent) {
-                    openfile(name);
+                    openfolder(name);
                 }
             });
             MenuItem folderdeleteItem = new MenuItem("删除");
@@ -474,14 +653,29 @@ public class HelloController {
                 @Override
                 public void handle(ActionEvent actionEvent) {
                     FileSub.removedir(((Label)item.getValue().getChildren().get(0)).getText());//点击删除按钮后执行remove和delete函数
-                    deletefile();
+                    delete_file_or_folder();
                 }
             });
             MenuItem foldertypeItem = new MenuItem("属性");
             foldertypeItem.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(ActionEvent actionEvent) {
-                    System.out.println("属性");
+                    //展示文件夹属性
+                    Folder X=FileSub.showdir(name);
+                    Label exist=new Label("---存在文件夹"+name+"---");
+                    exist.setPrefSize(400,10);
+                    Label filetype=new Label("文件类型:"+X.type);
+                    filetype.setPrefSize(400,10);
+                    Label filesize=new Label("文件大小:"+X.size);
+                    filesize.setPrefSize(400,10);
+                    Writebox.getChildren().add(exist);
+                    AnchorPane.setTopAnchor(exist,15.0+(Writebox.getChildren().size()-3)*20);
+                    Writebox.getChildren().add(filetype);
+                    AnchorPane.setTopAnchor(filetype,15.0+(Writebox.getChildren().size()-3)*20);
+                    Writebox.getChildren().add(filesize);
+                    AnchorPane.setTopAnchor(filesize,15.0+((Writebox.getChildren().size()-3))*20);
+                    setposLabel();
+                    setfieldPane();
                 }
             });
             MenuItem folderMenuItem1 = new MenuItem("新建文件");
@@ -496,7 +690,7 @@ public class HelloController {
             folderMenuItem2.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(ActionEvent actionEvent) {
-                    createFolder();//点击新建文件夹之后新启动一个画面，来输入对应的信息进行新建
+                    createFolder();
                 }
             });
             getItems().addAll(folderopenItem,folderdeleteItem,foldertypeItem,folderMenuItem1,folderMenuItem2);
@@ -526,6 +720,7 @@ public class HelloController {
     }
 
     public void addRightMenu(TreeView treeView){
+
         treeView.addEventFilter(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
@@ -533,14 +728,16 @@ public class HelloController {
                     return;
                 Node node = event.getPickResult().getIntersectedNode();
                 //如果不能够展开，就是文件
-                if(!((TreeItem<?>) treeView.getSelectionModel().getSelectedItem()).expandedProperty().get())
+                if(!((TreeItem<?>) treeView.getSelectionModel().getSelectedItem()).expandedProperty().get())//如果点击的是文件
                 {
                     if(event.getClickCount()==2)//设置双击的事件
                     {
+                        item=(TreeItem<Pane>) treeView.getSelectionModel().getSelectedItem();
                         openfile(((Label)((TreeItem<Pane>) treeView.getSelectionModel().getSelectedItem()).getValue().getChildren().get(0)).getText());//双击的话就点击打开窗口
                     }
                     if(event.getButton()==MouseButton.SECONDARY)//设置右键点击的事件  开启一个新的弹窗
                     {
+                        item=(TreeItem<Pane>) treeView.getSelectionModel().getSelectedItem();
                         FileMenu X=new FileMenu();//特地用给file的弹窗类
                         X.name=((Label)((TreeItem<Pane>) treeView.getSelectionModel().getSelectedItem()).getValue().getChildren().get(0)).getText();//将文件名字给到类中
                         X.show(node,Side.BOTTOM,0,0);
@@ -595,7 +792,6 @@ public class HelloController {
         X.getChildren().addAll(Xname,P);
         return X;
     }
-
     //新建文件窗口
     public  void createFile(){
         Pane filePane = new Pane();
@@ -648,16 +844,24 @@ public class HelloController {
                 }
                 TreeItem<Pane> newItem=new TreeItem<>(make_Pane(filename,true));
                 newItem.setExpanded(false);
+                SetItem();//获取当前应当选中的item
                 item.getChildren().add(newItem);
                 int index=FileSub.findFAT(3);//找到对应的空闲的盘块
-                FileSub.currentpath=printcurrent();//获取对应的当前路径
-                FileSub.findFolder(FileSub.currentpath);//修改当前路径下的所在的文件夹
-                File X=new File(filename,FileSub.currentpath+"\\"+filename,index,FileSub.F,0,1);
-                FileSub.F.addChildrenNode(X);//当前的文件夹数据添加文件节点，并更新数据
+                FileSub.findFolder(printcurrent());//修改当前路径下的所在的文件夹
+                File X=new File(filename,printcurrent()+"\\"+filename,index,FileSub.F,0,1);
+                System.out.println(printcurrent()+"\\"+filename);
+                boolean can=FileSub.F.addChildrenNode(X);//当前的文件夹数据添加文件节点，并更新数据
+                if(!can)
+                {
+                    Label label=new Label("文件夹内容不能超过8个");
+                    Writebox.getChildren().add(label);
+                    AnchorPane.setTopAnchor(label,15.0+((Writebox.getChildren().size()-3))*20);
+                    fileStage.close();//点击确定后关闭界面
+                    return;
+                }
                 FileSub.Disk.blocks[index].BlockChange(-1,X,true);//更改对应的磁盘块的内容
                 FileSub.FatTable.IndexArray[index]=-1;//修改FAT表
                 //对后端数据的修改
-
                 //在桌面设置文件的图片
                 Image FilePicture=new Image("File.png");
                 ImageView FP=new ImageView();
@@ -680,7 +884,10 @@ public class HelloController {
                         }
                     }
                 });
+
                 fileStage.close();//点击确定后关闭界面
+                changeDiskusing();
+                changeFAT();//关闭页面后FAT和磁盘使用进行更新
             }
         });
         bt2.addEventFilter(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
@@ -748,14 +955,16 @@ public class HelloController {
                 }
                 TreeItem<Pane> newItem=new TreeItem<>(make_Pane(filename,false));
                 newItem.setExpanded(true);
+                SetItem();//获取当前应当选中的item
                 item.getChildren().add(newItem);
                 FileSub.mkdir(filename);
                 //对后端数据的修改
-                FileSub.currentpath=printcurrent();
-/*                System.out.println(FileSub.currentpath);*/
                 folderStage.close();//关闭窗口
+                changeDiskusing();
+                changeFAT();//关闭窗口后更新
             }
         });
+
         bt2.addEventFilter(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
@@ -764,6 +973,25 @@ public class HelloController {
                 folderStage.close();
             }
         });
+    }
+    public void SetItem()
+    {
+        String[] pos=FileSub.currentpath.split("\\\\");
+        if(item==null)
+        {
+            TreeItem<Pane> X=root;
+            //如果是root直接用
+            for (String po : pos) {
+                for (int j = 0; j < X.getChildren().size(); j++) {
+                    if (((Label) X.getChildren().get(j).getValue().getChildren().get(0)).getText().equals(po)) {
+                        X = X.getChildren().get(j);//迭代
+                        break;
+                    }
+
+                }
+            }
+            item=X;
+        }
     }
     public String  printcurrent()//获取当前路径
     {
