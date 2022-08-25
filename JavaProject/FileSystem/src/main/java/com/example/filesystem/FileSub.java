@@ -7,7 +7,7 @@ public class FileSub {
     public static FAT FatTable=new FAT();
     public static disk Disk=new disk();
     public static Folder F=Disk.root;//记录当前所在文件夹的变量，一般初始化为根目录
-    public static String currentpath;//记录当前路径的变量 这个路径指的是当前在输入文字栏显示的路径
+    public static String currentpath="ROOT";//记录当前路径的变量 这个路径指的是当前在输入文字栏显示的路径
     public static char[] buffer1=new char[64];
     public static char[] buffer2=new char[64];
     /*双缓冲是第一个缓冲区读入数据完成时第二个缓冲区开始工作，读入用户区结束后判断第一个缓冲区是否停止工作，如果停止工作那继续向第一个缓冲读入数据。*/
@@ -210,15 +210,14 @@ public class FileSub {
         }
         return false;
     }
+
+
     public static boolean delete_file(String filename)
     {
         for(int i=0;i<F.item.size();i++)
         {
             if(F.item.get(i).split("\\.")[0].equals(filename))
             {
-                for(int j=0;j<Disk.filesOpened.size();j++)
-                    if(Disk.filesOpened.get(j).path.equals(currentpath+"\\"+filename))
-                        return false;//如果打开就返回操作失败
                 File file = (File) (F.children.get(i));
                 int pos=0;
                 for(int index=file.num;index!=-1;index=pos)
@@ -241,11 +240,6 @@ public class FileSub {
             String name=F.item.get(i).split("\\.")[0];
             if(name.equals(filename))
             {
-/*                if(Disk.filesOpened==null)
-                    return null;
-                for(int j=0;j<Disk.filesOpened.size();j++)
-                    if(Disk.filesOpened.get(j).path.equals(currentpath+"\\"+filename))
-                        return null;*///search不需要打开
                 File file=(File)F.children.get(i);
                 return file;
                 /*然后就是将file中的各项信息展示出来*/
@@ -272,17 +266,21 @@ public class FileSub {
         }
         return false;
     }
-    public static boolean mkdir(String Foldername)
+    public static boolean mkpathdir(String Foldername,String path)
     {
+        findFolder(path);
         for(int i=0;i<F.item.size();i++)
             if(F.item.get(i).substring(0,3).equals(Foldername))//有同名目录
                 return false;
         int index=findFAT(2);
-        Folder folder=new Folder(Foldername,currentpath+"\\"+Foldername,index,F);
+        Folder folder=new Folder(Foldername,path+"\\"+Foldername,index,F);
         Disk.blocks[index].BlockChange(-1,folder,true);
+        F.children.add(folder);
+        F.addChildrenNode(folder);
         FatTable.IndexArray[index]=-1;
         return true;
     }
+
     public static Folder showdir(String Foldername)
     {
         for(int i=0;i<F.item.size();i++)
@@ -298,11 +296,11 @@ public class FileSub {
     }
     public static boolean removedir(String Foldername)
     {
-        if(Foldername.equals("root"))
+        if(Foldername.equals("ROOT"))
             return false;
         for(int i=0;i<F.item.size();i++)
         {
-            if(F.item.get(i).substring(0,3).equals(Foldername))//有同名目录
+            if(F.item.get(i).split(" ")[0].equals(Foldername))//有同名目录
             {
                 Folder folder=(Folder)F.children.get(i);
                 if(folder.size==0)//删除空目录首先要找到该目录，如果目录不存在，指令执行失败；如果存在，但是根目录或非空目录，显示不能删除，操作失败
@@ -318,6 +316,40 @@ public class FileSub {
         }
         return false;//找不到同名目录项
     }
-
+    public static boolean removepathdir(String path)
+    {
+        if(path.equals("ROOT"))
+            return false;
+        for(int i=0;i<128;i++)
+        {
+            if(Disk.blocks[i].object==null)
+                continue;
+            if(Disk.blocks[i].object.getClass().toString().equals("class com.example.filesystem.Folder"))
+            {
+                Folder X=(Folder)FileSub.Disk.blocks[i].object;
+                if(X.path.equals(path))
+                {
+                    if(X.children.size()>0)
+                        return false;
+                    Folder F=X.parent;
+                    FatTable.IndexArray[X.num]=0;
+                    Disk.blocks[X.num].BlockChange(-1,null,true);
+                    for(int j=0;j<F.children.size();j++)
+                    {
+                        if(F.children.get(j).getClass().toString().equals("class com.example.filesystem.Folder"))
+                        {
+                            if(((Folder)F.children.get(j)).path.equals(path))
+                            {
+                                F.item.remove(j);
+                                F.children.remove(j);
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
 
 }
