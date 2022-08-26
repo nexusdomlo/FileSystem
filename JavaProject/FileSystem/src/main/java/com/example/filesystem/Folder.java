@@ -24,6 +24,8 @@ public class Folder {
         {
             item.add("$       ");//初始化的过程，添加8个$，就是八个空目录项
         }
+        disk D=FileSub.Disk;
+        D.blocks[num].BlockChange(-1,this,true);
     }
     public boolean addChildrenNode(Object object)//用于添加孩子节点的函数
     {

@@ -13,7 +13,6 @@ public class disk {
         blocks=new Block[128];
         blocks[0]=new Block(0,-1,FileSub.FatTable,true);
         blocks[1]=new Block(1,-1,FileSub.FatTable,true);
-
         blocks[2]=new Block(2,-1,this.root,true);
         for(int i=3;i<128;i++)
         {

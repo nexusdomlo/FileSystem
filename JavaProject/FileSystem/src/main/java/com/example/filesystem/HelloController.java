@@ -26,9 +26,10 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class HelloController {
@@ -80,6 +81,50 @@ public class HelloController {
 
         helpStage.show();
     }
+/*    public void Keepdata(){
+        BufferedWriter bufferedWriter = null;
+        BufferedWriter bufferedWriter1 =null;
+        try {
+            bufferedWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("DISK.txt"), "UTF-8"));
+            bufferedWriter1 = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("DISK.txt"), "UTF-8"));
+            for(int i=0;i< FileSub.FatTable.IndexArray.length;i++)
+            {
+                if(i<2)
+                {
+                    bufferedWriter.write(i +" "+FileSub.FatTable.IndexArray[i]+" FAT "+"-1");//记录前两个block的数据
+                    bufferedWriter.newLine();//保存FAT数据
+                }
+                else {
+                    if(FileSub.Disk.blocks[i].object.getClass().toString().equals("class com.example.filesystem.Folder"))
+                    {
+                        bufferedWriter.write(i +" "+FileSub.FatTable.IndexArray[i]+" "+((Folder)FileSub.Disk.blocks[i].object).folderName+" "+FileSub.Disk.blocks[i].begin);//保存文件夹数据
+                        bufferedWriter.newLine();//保存FAT数据
+                    }
+                    else if(FileSub.Disk.blocks[i].object.getClass().toString().equals("class com.example.filesystem.File"))
+                    {
+                        bufferedWriter.write(i +" "+FileSub.FatTable.IndexArray[i]+" "+((File)FileSub.Disk.blocks[i].object).fileName+" "+FileSub.Disk.blocks[i].begin);//保存文件夹数据
+                        bufferedWriter.newLine();//保存FAT数据
+                    }else{
+                        bufferedWriter.write(i +" "+FileSub.FatTable.IndexArray[i]+" null "+"-1");//保存文件夹数据
+                        bufferedWriter.newLine();//保存FAT数据
+                    }
+                }
+            }
+            bufferedWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("FAT.txt"), "UTF-8"));
+
+        } catch (Exception e) {
+
+        } finally {
+            try {
+                if (bufferedWriter != null) {
+                    bufferedWriter.close();
+                    bufferedWriter.close();
+                }
+            } catch (Exception e) {
+
+            }
+        }
+    }*/
 
     //关于我们按钮点击事件
     @FXML
@@ -361,7 +406,8 @@ public class HelloController {
                             }
                             else
                             {
-                                openfolder(orderString[1].substring(1));//执行打开文件的操作
+                                FileSub.findFolder(FileSub.currentpath+"\\"+orderString[1].substring(1));
+                                openfolder(FileSub.F);//执行打开文件的操作
                                 field.setEditable(false);
                             }
 
@@ -435,7 +481,6 @@ public class HelloController {
                             updatePie();
                         }
                         else{
-/*                            System.out.println(FileSub.currentpath+"\\"+orderString[1].substring(1));*/
                             if(!FileSub.removedir(orderString[1].substring(1)))
                             {
                                 errormessage("不存在该文件夹，请检查输入的文件夹名");
@@ -578,12 +623,10 @@ public class HelloController {
     {
         for(int i=9;i<mainInterface.getChildren().size();i+=2)
         {
-            System.out.println(mainInterface.getChildren().get(i).getClass().toString());
             if(mainInterface.getChildren().get(i).getClass().toString().equals("class javafx.scene.control.Label"))
             {
                 if(((Label)mainInterface.getChildren().get(i)).getText().equals(name))
                 {
-                    System.out.println(1);
                     mainInterface.getChildren().remove(i);
                     mainInterface.getChildren().remove(i-1);
                     i-=2;
@@ -695,7 +738,14 @@ public class HelloController {
             Scene fileScene = new Scene(filePane,800,600);//设置窗口的大小
             Stage fileStage = new Stage();
             fileStage.setScene(fileScene);
-            fileStage.setTitle(X.fileName);//设置窗口的标题
+            if(X.type==1)
+            {
+                fileStage.setTitle(X.fileName+"(读写)");//设置窗口的标题
+                textArea.setEditable(true);
+            }else{
+                fileStage.setTitle(X.fileName+"(只读)");
+                textArea.setEditable(false);
+            }
             fileStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
                 @Override
                 public void handle(WindowEvent windowEvent) {
@@ -714,20 +764,20 @@ public class HelloController {
         }
 
     }
-    public void openfolder(String foldername)
+    public void openfolder(Folder folder)
     {
         Pane filePane=new Pane();
 
-        for(int i=0;i<FileSub.F.children.size();i++)
+        for(int i=0;i<folder.children.size();i++)
         {
-            if(FileSub.F.children.get(i) instanceof File)//如果他属于文件类
+            if(folder.children.get(i) instanceof File)//如果他属于文件类
             {
                 Image fl=new Image("Txt.png");
                 ImageView FIV=new ImageView();
                 FIV.setImage(fl);
                 FIV.setFitHeight(40);
                 FIV.setFitWidth(40);
-                Label FLname=new Label(((File)FileSub.F.children.get(i)).fileName);
+                Label FLname=new Label(((File)folder.children.get(i)).fileName);
                 FIV.setLayoutX(15.0+i*30);
                 FIV.setLayoutY(10);
                 FLname.setLayoutX(27.0+i*30);
@@ -739,27 +789,28 @@ public class HelloController {
                     @Override
                     public void handle(MouseEvent mouseEvent) {
                         if(mouseEvent.getClickCount()==2)
-                            openfile((File)FileSub.F.children.get(finalI));
+                            openfile((File)folder.children.get(finalI));
                     }
                 });
             }
-            else if(FileSub.F.children.get(i) instanceof Folder){
+            else if(folder.children.get(i) instanceof Folder){
                 Image fl=new Image("File.png");
                 ImageView FIV=new ImageView();
                 FIV.setImage(fl);
                 FIV.setFitHeight(40);
                 FIV.setFitWidth(40);
-                Label FLname=new Label(((Folder)FileSub.F.children.get(i)).folderName);
+                Label FLname=new Label(((Folder)folder.children.get(i)).folderName);
                 FIV.setLayoutX(15.0+i*30);
                 FIV.setLayoutY(10);
                 FLname.setLayoutX(27.0+i*30);
                 FLname.setLayoutY(50);
                 filePane.getChildren().add(FIV);
                 filePane.getChildren().add(FLname);
+                int finalI1 = i;
                 FIV.addEventFilter(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
                     @Override
                     public void handle(MouseEvent mouseEvent) {
-                        openfolder(FLname.getText());
+                        openfolder((Folder)folder.children.get(finalI1));
                     }
                 });
             }
@@ -768,7 +819,7 @@ public class HelloController {
         Scene fileScene = new Scene(filePane,600,400);//设置窗口的大小
         Stage fileStage = new Stage();
         fileStage.setScene(fileScene);
-        fileStage.setTitle(foldername);//设置窗口的标题
+        fileStage.setTitle(folder.folderName);//设置窗口的标题
         fileStage.show();
 
     }
@@ -822,13 +873,13 @@ public class HelloController {
     }
     public class FolderMenu extends ContextMenu {
         public String name;
-
+        public Folder folder;
         public FolderMenu() {
             MenuItem folderopenItem = new MenuItem("打开");
             folderopenItem.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(ActionEvent actionEvent) {
-                    openfolder(name);
+                    openfolder(folder);
                 }
             });
             MenuItem folderdeleteItem = new MenuItem("删除");
@@ -931,7 +982,6 @@ public class HelloController {
                     {
                         item=(TreeItem<Pane>) treeView.getSelectionModel().getSelectedItem();
                         FileMenu L=new FileMenu();//特地用给file的弹窗类
-                        /*System.out.println(printcurrent());*/
                         L.name=((Label)((TreeItem<Pane>) treeView.getSelectionModel().getSelectedItem()).getValue().getChildren().get(0)).getText();//将文件名字给到类中
                         L.X=FileSub.findfile(printcurrent());
                         L.show(node,Side.BOTTOM,0,0);
@@ -949,12 +999,15 @@ public class HelloController {
                         item=(TreeItem<Pane>) treeView.getSelectionModel().getSelectedItem();
                     }
                     else{
+                        item=(TreeItem<Pane>) treeView.getSelectionModel().getSelectedItem();
                         if(event.getButton()!=MouseButton.SECONDARY)
                             return;
                         FolderMenu X=new FolderMenu();
                         X.name=((Label)((TreeItem<Pane>) treeView.getSelectionModel().getSelectedItem()).getValue().getChildren().get(0)).getText();
+                        FileSub.findFolder(printcurrent());
+                        X.folder=FileSub.F;
                         X.show(node,Side.BOTTOM,0,0);
-                        item=(TreeItem<Pane>) treeView.getSelectionModel().getSelectedItem();
+
                     }
 
                 }
@@ -1104,7 +1157,6 @@ public class HelloController {
 
     //新建文件夹窗口
     public  void createFolder(){
-
         Pane folderPane = new Pane();
         Image icon1 = new Image("File.png");
         ImageView view1 = new ImageView();

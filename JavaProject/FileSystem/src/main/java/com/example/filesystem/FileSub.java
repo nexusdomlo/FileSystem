@@ -58,7 +58,7 @@ public class FileSub {
     }
 
 
-    public static boolean open_file(String fileName,int operatetype)//一个是文件名，一个是操作类型  返回的是是否已经打开的提示，如果找不到文件就返回false
+/*    public static boolean open_file(String fileName,int operatetype)//一个是文件名，一个是操作类型  返回的是是否已经打开的提示，如果找不到文件就返回false
     {
         //operatetype中0代表写操作，1代表读操作
         for(int i=0;i<8;i++)
@@ -91,8 +91,8 @@ public class FileSub {
            }
         }
         return false;//找不到对应的文件来打开，返回false
-    }
-    public static String read_file(String fileName,int lengths)
+    }*/
+/*    public static String read_file(String fileName,int lengths)
     {
         //如果长度小于等于0返回null，如果读写的方式不对也返回null，找不到也返回null
         if(lengths<=0)
@@ -133,7 +133,7 @@ public class FileSub {
                     file.content=file.content+Arrays.toString(buffer);//模拟写文件，按照缓冲区来一个个输入
                     buffer1=new char[64];//将缓冲区的东西清空
                     buffer2=new char[64];
-/*                    Disk.filesOpened.get(i).end= FatTable.IndexArray[Disk.filesOpened.get(i).end];*/
+*//*                    Disk.filesOpened.get(i).end= FatTable.IndexArray[Disk.filesOpened.get(i).end];*//*
                     Disk.blocks[Disk.filesOpened.get(i).end].BlockChange(-1,file,false);
                     FatTable.IndexArray[Disk.filesOpened.get(i).end]=-1;//更新FAT表
                     return;
@@ -176,7 +176,7 @@ public class FileSub {
         }
         open_file(filename,0);//如果不存在就以写操作来打开文件
         write_file(filename,buffer,length,begin);
-    }
+    }*/
     public static void close_file(String filename)
     {
         for(int i=0;i<Disk.filesOpened.size();i++)
