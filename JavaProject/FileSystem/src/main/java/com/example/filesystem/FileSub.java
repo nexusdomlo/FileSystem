@@ -28,7 +28,7 @@ public class FileSub {
         for(int i=2;i<128;i++)
         {
             if(Disk.blocks[i].object==null)
-                return false;
+                continue;
             if(Disk.blocks[i].object.getClass().toString().equals("class com.example.filesystem.Folder"))
             {
                 if(p.equals(((Folder)Disk.blocks[i].object).path))

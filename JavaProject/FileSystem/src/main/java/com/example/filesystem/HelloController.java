@@ -898,7 +898,7 @@ public class HelloController {
                 @Override
                 public void handle(ActionEvent actionEvent) {
                     //展示文件夹属性
-                    Folder X=FileSub.showdir(name);
+                    Folder X=folder;
                     Label exist=new Label("---存在文件夹"+name+"---");
                     exist.setPrefSize(400,10);
                     Label filetype=new Label("文件类型:"+X.type);
