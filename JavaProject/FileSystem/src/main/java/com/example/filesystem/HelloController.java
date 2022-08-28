@@ -29,7 +29,6 @@ import javafx.stage.WindowEvent;
 import java.io.*;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class HelloController {
@@ -312,7 +311,7 @@ public class HelloController {
                 stackPane.setStyle("-fx-background-color: #c8c8c8");
         }
     }
-    public void errormessage(String message)
+    public void setmessage(String message)
     {
         Label exist=new Label("---"+message+"---");
         exist.setPrefSize(400,10);
@@ -397,12 +396,12 @@ public class HelloController {
                                     field.setEditable(false);
 
                                 } else {
-                                    errormessage("不存在文件" + orderString[1]);
+                                    setmessage("不存在文件" + orderString[1]);
                                     field.setEditable(false);
                                 }
                             }
                             else{
-                                errormessage("错误的指令");
+                                setmessage("错误的指令");
                                 field.setEditable(false);
                             }
                             break;
@@ -421,7 +420,7 @@ public class HelloController {
                                     }
 
                                 } else {
-                                    errormessage("不存在文件" + orderString[1]);
+                                    setmessage("不存在文件" + orderString[1]);
                                     field.setEditable(false);
                                 }
                             }
@@ -430,7 +429,7 @@ public class HelloController {
                                 boolean exist=FileSub.findFolder(FileSub.currentpath+"\\"+orderString[1].substring(1));//通过exist来查看文件夹是否存在
                                 if(!exist)
                                 {
-                                    errormessage("不存在文件夹"+orderString[1]);
+                                    setmessage("不存在文件夹"+orderString[1]);
                                     field.setEditable(false);
                                 }
                                 else
@@ -456,7 +455,7 @@ public class HelloController {
                                 setinputmessage(FileSub.currentpath);
                             }
                             else{
-                                errormessage("错误的指令，请输入正确的指令");
+                                setmessage("错误的指令，请输入正确的指令");
                                 field.setEditable(false);
                             }
                             break;
@@ -468,7 +467,7 @@ public class HelloController {
                                 setinputmessage(FileSub.currentpath);
                             }
                             else{
-                                errormessage("错误的指令，请输入正确的指令");
+                                setmessage("错误的指令，请输入正确的指令");
                                 field.setEditable(false);
                             }
                             break;
@@ -479,7 +478,7 @@ public class HelloController {
                                 if(!FileSub.delete_file(orderString[1]))//如果FileSub中的delete函数返回false，那么说明不存在文件
                                 {
                                     field.setEditable(false);
-                                    errormessage("不存在该文件，请检查输入的文件名");
+                                    setmessage("不存在该文件，请检查输入的文件名");
                                     return;
                                 }
                                 delete_file_or_folder(orderString[1]);
@@ -491,7 +490,7 @@ public class HelloController {
                             else{
                                 if(!FileSub.removedir(orderString[1].substring(1)))
                                 {
-                                    errormessage("不存在该文件夹，请检查输入的文件夹名");
+                                    setmessage("不存在该文件夹，请检查输入的文件夹名");
                                     return;
                                 }
                                 delete_file_or_folder(orderString[1].substring('$'));
@@ -508,7 +507,7 @@ public class HelloController {
 
                                 if(X==null)
                                 {
-                                    errormessage("不存在文件"+orderString[1]);
+                                    setmessage("不存在文件"+orderString[1]);
                                     field.setEditable(false);
                                 }
                                 else{
@@ -523,7 +522,7 @@ public class HelloController {
                                 exist.setPrefSize(400,10);
                                 if(X==null)
                                 {
-                                    errormessage("不存在文件"+orderString[1]);
+                                    setmessage("不存在文件"+orderString[1]);
                                     field.setEditable(false);
                                 }
                                 else
@@ -535,10 +534,11 @@ public class HelloController {
                             break;
                         case "change":
                             String[] changeorder=orderString[1].split("\\.");
-                            FileSub.change(changeorder[0],changeorder[1]);
+                            if(!FileSub.change(changeorder[0],changeorder[1]))
+                                setmessage("指令有误，请检查输入的指令");
+                            else
+                                setmessage("修改成功");
                             field.setEditable(false);
-                            setinputmessage(FileSub.currentpath);
-                            //只能够改变文件
                             break;
                         case "clear":
                             Writebox.getChildren().clear();
@@ -547,7 +547,7 @@ public class HelloController {
                         case "cd":
                             if(!FileSub.findFolder(orderString[1]))
                             {
-                                errormessage("路径不存在");
+                                setmessage("路径不存在");
                                 field.setEditable(false);
                             }
                             else{
@@ -556,7 +556,7 @@ public class HelloController {
                             }
                             break;
                         default:
-                            errormessage("错误的指令，请输入正确的指令");
+                            setmessage("错误的指令，请输入正确的指令");
                             field.setEditable(false);
                             break;
                     }
@@ -710,13 +710,7 @@ public class HelloController {
     }
     public void openfile(File X) {
         if(X==null) {
-            Label exist;
-            exist=new Label("---不存在该文件---");
-            exist.setPrefSize(400,10);
-            Writebox.getChildren().add(exist);
-            AnchorPane.setTopAnchor(exist,15.0+(Writebox.getChildren().size()-3)*20);
-            setposLabel(FileSub.currentpath);
-            setfieldPane();
+            setmessage("不存在该文件");
         }
         else {
             Pane filePane=new Pane();
@@ -729,7 +723,7 @@ public class HelloController {
             Scene fileScene = new Scene(filePane,800,600);//设置窗口的大小
             Stage fileStage = new Stage();
             fileStage.setScene(fileScene);
-            if(X.type==1)
+            if(X.flag==0)
             {
                 fileStage.setTitle(X.fileName+"(读写)");//设置窗口的标题
                 textArea.setEditable(true);
@@ -819,20 +813,33 @@ public class HelloController {
     //添加右键菜单
     public class FileMenu extends ContextMenu {
         public  String name;
-        public File X;
+        public File file;
         public FileMenu(){
             MenuItem fileopenItem=new MenuItem("打开");
             fileopenItem.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(ActionEvent actionEvent) {
-                    openfile(X);
+                    openfile(file);
                 }
             });
             MenuItem filedeleteItem=new MenuItem("删除");
             filedeleteItem.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(ActionEvent actionEvent) {
-                    FileSub.delete_pathfile(printcurrent());
+                    FileSub.delete_pathfile(file.path);
+                    String[] pos=file.path.split("\\\\");
+                    TreeItem<Pane> X=root;
+                    //如果是root直接用
+                    for (String po : pos) {
+                        for (int j = 0; j < X.getChildren().size(); j++) {
+                            if (((Label) X.getChildren().get(j).getValue().getChildren().get(0)).getText().equals(po)) {
+                                X = X.getChildren().get(j);//迭代
+                                break;
+                            }
+
+                        }
+                    }
+                    item=X;
                     TreeItem<Pane> Par=item.getParent();
                     Par.getChildren().remove(item);
                     changeFAT();
@@ -845,9 +852,7 @@ public class HelloController {
             filetypeItem.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(ActionEvent actionEvent) {
-                    File Q=FileSub.findfile(X.path);
-                    assert Q != null;
-                    searchfile(Q);
+                    searchfile(file);
                 }
             });
             getItems().addAll(fileopenItem,filedeleteItem,filetypeItem);
@@ -868,7 +873,20 @@ public class HelloController {
             folderdeleteItem.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(ActionEvent actionEvent) {
-                    FileSub.removepathdir(printcurrent());
+                    FileSub.removepathdir(folder.path);
+                    String[] pos=folder.path.split("\\\\");
+                    TreeItem<Pane> X=root;
+                    //如果是root直接用
+                    for (String po : pos) {
+                        for (int j = 0; j < X.getChildren().size(); j++) {
+                            if (((Label) X.getChildren().get(j).getValue().getChildren().get(0)).getText().equals(po)) {
+                                X = X.getChildren().get(j);//迭代
+                                break;
+                            }
+
+                        }
+                    }
+                    item=X;
                     //点击删除按钮后执行remove和delete函数
                     TreeItem<Pane> Par=item.getParent();
                     Par.getChildren().remove(item);
@@ -883,7 +901,6 @@ public class HelloController {
                 @Override
                 public void handle(ActionEvent actionEvent) {
                     //展示文件夹属性
-                    Folder X=folder;
                     searchfile(folder);
                 }
             });
@@ -891,6 +908,7 @@ public class HelloController {
             folderMenuItem1.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(ActionEvent actionEvent) {
+                    SetItem(folder.path);
                     createFile(0);
                     updatePie();
                 }
@@ -900,6 +918,7 @@ public class HelloController {
             folderMenuItem2.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(ActionEvent actionEvent) {
+                    SetItem(folder.path);
                     createFolder(0);
                     updatePie();
                 }
@@ -946,7 +965,6 @@ public class HelloController {
                     if(event.getClickCount()==2)//设置双击的事件
                     {
                         item=(TreeItem<Pane>) treeView.getSelectionModel().getSelectedItem();
-
                         File X=FileSub.findfile(printcurrent());
                         openfile(X);//双击的话就点击打开窗口
                     }
@@ -955,7 +973,7 @@ public class HelloController {
                         item=(TreeItem<Pane>) treeView.getSelectionModel().getSelectedItem();
                         FileMenu L=new FileMenu();//特地用给file的弹窗类
                         L.name=((Label)((TreeItem<Pane>) treeView.getSelectionModel().getSelectedItem()).getValue().getChildren().get(0)).getText();//将文件名字给到类中
-                        L.X=FileSub.findfile(printcurrent());
+                        L.file =FileSub.findfile(printcurrent());
                         L.show(node,Side.BOTTOM,0,0);
                     }
 
@@ -1023,7 +1041,6 @@ public class HelloController {
         view.setLayoutX(100);
         view.setLayoutY(20);
         //添加图片，设置图片位置
-
         HBox hb1 = new HBox();
         Label l1 = new Label("请输入文件名");
         hb1.getChildren().add(l1);
@@ -1066,7 +1083,7 @@ public class HelloController {
                 TreeItem<Pane> newItem=new TreeItem<>(make_Pane(filename,true));
                 newItem.setExpanded(false);
                 if(opertype==1)
-                    SetItem();//获取当前应当选中的item
+                    SetItem(FileSub.currentpath);//获取当前应当选中的item
                 item.getChildren().add(newItem);
                 int index=FileSub.findFAT(3);//找到对应的空闲的盘块
                 File X;
@@ -1108,8 +1125,10 @@ public class HelloController {
                     public void handle(MouseEvent mouseEvent) {
                         if(mouseEvent.getButton()==MouseButton.SECONDARY)
                         {
-                            FileMenu X=new FileMenu();
-                            X.show(FP,Side.BOTTOM,0,0);
+                            FileMenu G=new FileMenu();
+                            G.file =X;
+                            G.name=X.fileName;
+                            G.show(FP,Side.BOTTOM,0,0);
                         }
                     }
                 });
@@ -1182,13 +1201,14 @@ public class HelloController {
                 }
                 TreeItem<Pane> newItem=new TreeItem<>(make_Pane(filename,false));
                 newItem.setExpanded(true);
+                Folder Q;
                 if(opertype==1)
                 {
-                    SetItem();//获取当前应当选中的item
-                    FileSub.mkpathdir(filename,FileSub.currentpath);
+                    SetItem(FileSub.currentpath);//获取当前应当选中的item
+                    Q=FileSub.mkpathdir(filename,FileSub.currentpath);
                 }
                 else
-                    FileSub.mkpathdir(filename,printcurrent());
+                    Q=FileSub.mkpathdir(filename,printcurrent());
                 item.getChildren().add(newItem);
                 //对后端数据的修改
                 Image FilePicture=new Image("File.png");
@@ -1208,6 +1228,8 @@ public class HelloController {
                         if(mouseEvent.getButton()==MouseButton.SECONDARY)
                         {
                             FolderMenu X=new FolderMenu();
+                            X.folder=Q;
+                            X.name=Q.folderName;
                             X.show(FP,Side.BOTTOM,0,0);
                         }
                     }
@@ -1227,9 +1249,9 @@ public class HelloController {
             }
         });
     }
-    public void SetItem()
+    public void SetItem(String path)
     {
-        String[] pos=FileSub.currentpath.split("\\\\");
+        String[] pos=path.split("\\\\");
         TreeItem<Pane> X=root;
         //如果是root直接用
         for (String po : pos) {

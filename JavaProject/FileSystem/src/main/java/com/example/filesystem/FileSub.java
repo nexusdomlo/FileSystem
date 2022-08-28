@@ -237,26 +237,28 @@ public class FileSub {
                 File file=(File)F.children.get(i);
                 if(t.equals("OR"))
                     file.type=1;
-                else
+                else if(t.equals("RAW"))
                     file.type=0;//更改文件的属性
+                else
+                    return false;
                 /*然后就是将file中的各项信息展示出来*/
             }
         }
         return false;
     }
-    public static boolean mkpathdir(String Foldername,String path)
+    public static Folder mkpathdir(String Foldername,String path)
     {
         findFolder(path);
         for(int i=0;i<F.item.size();i++)
             if(F.item.get(i).substring(0,3).equals(Foldername))//有同名目录
-                return false;
+                return null;
         int index=findFAT(2);
         Folder folder=new Folder(Foldername,path+"\\"+Foldername,index,F);
         Disk.blocks[index].BlockChange(-1,folder,true);
         F.children.add(folder);
         F.addChildrenNode(folder);
         FatTable.IndexArray[index]=-1;
-        return true;
+        return folder;
     }
 
     public static Folder showdir(String Foldername)
