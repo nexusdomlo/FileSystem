@@ -33,34 +33,6 @@ import java.util.Arrays;
 import java.util.List;
 
 public class HelloController {
-/*    @FXML
-    private ImageView aboutUs;
-
-    @FXML
-    private ImageView fileStorage;
-
-    @FXML
-    private ImageView main_BG;
-
-    @FXML
-    private MenuBar startMenuBar;
-
-    @FXML
-    private ImageView startMenu;
-
-    @FXML
-    private MenuItem menuItem1;
-
-    @FXML
-    private MenuItem menuItem3;
-
-    @FXML
-    private MenuItem menuItem2;
-    @FXML
-    private ImageView Tips;
-    @FXML
-    private MenuItem menuItem4;*/
-
     @FXML
     private AnchorPane mainInterface;
     public TreeItem<Pane> item;
@@ -233,6 +205,7 @@ public class HelloController {
     {
         //diskUsing区域
         List<StackPane> disk = new ArrayList();
+        myPane=new GridPane();
         myPane.setStyle("-fx-background-color: #fff");
         myPane.setVgap(3.0D); //两个格子之间的垂直距离
         myPane.setHgap(3.0D); //两个格子之间的水平距离
@@ -255,9 +228,9 @@ public class HelloController {
     {
         for(int i = 0; i < 128; ++i) {
             StackPane X=(StackPane) myPane.getChildren().get(i);
-            if(FileSub.Disk.blocks[i].object!=null)
-                X.setStyle("-fx-background-color: #00ff00");
-            else
+            if(FileSub.Disk.blocks[i].object!=null) {
+                X.setStyle("-fx-background-color: red");
+            }            else
                 X.setStyle("-fx-background-color: #c8c8c8");
 
         }
@@ -266,6 +239,7 @@ public class HelloController {
     //存储按钮
     @FXML
     void Store(MouseEvent event) {
+        commandPane=new Pane();
         Scene scene = new Scene(commandPane,1000,800);//750的宽度，550的高度
         Stage startStage = new Stage();
         startStage.setScene(scene);
@@ -284,8 +258,8 @@ public class HelloController {
         addFAT(780,0,commandPane);
         startStage.show();
         FileSub.currentpath="ROOT";
-        changeDiskusing();
         changeFAT();
+        changeDiskusing();
     }
     public VBox numberBox = new VBox();
     public VBox contentBox = new VBox();
@@ -347,6 +321,47 @@ public class HelloController {
         setposLabel(FileSub.currentpath);
         setfieldPane();
     }
+    public void setinputmessage(String path)
+    {
+        setposLabel(path);
+        setfieldPane();
+    }
+    public String GetFileType(int type)
+    {
+        String X="";
+        while(type>0)
+        {
+            if(type%2==0)
+            {
+                X="0"+X;
+            }
+            else{
+                X="1"+X;
+
+            }
+            type=type/2;
+        }
+        System.out.println(X);
+        System.out.println(X.charAt(2));
+        if(X.length()==4)
+            return "目录项";
+        else{
+            if(X.length()==3)
+            {
+                if(X.charAt(2)=='0')
+                    return "可读写的普通文件";
+                else
+                    return "只读的普通文件";
+            }
+            else{
+                if(X.charAt(1)=='0')
+                    return "可读写的系统文件";
+                else
+                    return "只读的系统文件";
+            }
+        }
+
+    }
     public AnchorPane Writebox = new AnchorPane();//用AnchorPane设置输入栏的文字和位置
     public void setfieldPane()
     {
@@ -371,247 +386,179 @@ public class HelloController {
                 if(keyEvent.getCode()== KeyCode.ENTER){
                     String order=field.getText();
                     String[] orderString=order.split(" ");
-                    if(orderString[0].equals("open"))
-                    {
-                        if(orderString[1].charAt(0)!='$')//操作的是文件
-                        {
-                            File X=FileSub.findfile(FileSub.currentpath+"\\"+orderString[1]);//在输入端只能通过当前位置来查找
-                            if(X!=null)
+                    switch(orderString[0]){
+                        case "read":
+                            if(orderString[1].charAt(0)!='$')//操作的是文件
                             {
-                                openfile(X);
-                                field.setEditable(false);
-                            }
-                            else {
-                                Label exist=new Label("---不存在文件"+orderString[1]+"---");
-                                exist.setPrefSize(400,10);
-                                field.setEditable(false);
-                                Writebox.getChildren().add(exist);
-                                AnchorPane.setTopAnchor(exist,15.0+(Writebox.getChildren().size()-3)*20);
-                                setposLabel(FileSub.currentpath);
-                                setfieldPane();
-                            }
-                        }
-                        else
-                        {
-                            boolean exist=FileSub.findFolder(FileSub.currentpath+"\\"+orderString[1].substring(1));
-                            if(!exist)
-                            {
-                                Label labels=new Label("---不存在文件夹"+orderString[1]+"---");
-                                labels.setPrefSize(400,10);
-                                Writebox.getChildren().add(labels);
-                                AnchorPane.setTopAnchor(labels,15.0+(Writebox.getChildren().size()-3)*20);
-                                field.setEditable(false);
-                                setposLabel(FileSub.currentpath);
-                                setfieldPane();
-                            }
-                            else
-                            {
-                                FileSub.findFolder(FileSub.currentpath+"\\"+orderString[1].substring(1));
-                                openfolder(FileSub.F);//执行打开文件的操作
-                                field.setEditable(false);
-                            }
+                                File X = FileSub.findfile(FileSub.currentpath + "\\" + orderString[1]);//在输入端只能通过当前位置来查找
+                                if (X != null) {
+                                    openfile(X);
+                                    FileSub.open_file(X.fileName,1);
+                                    field.setEditable(false);
 
-                        }
-                    }
-                    else if(orderString[0].equals("create"))
-                    {
-                        if(orderString[1].equals("file"))//操作的是文件
-                        {
-                            createFile();//弹出弹框进行操作
-                            updatePie();
-                            field.setEditable(false);
-                            setposLabel(FileSub.currentpath);
-                            setfieldPane();
-                        }
-                        else if(orderString[1].equals("folder")){
-                            createFolder();
-                            updatePie();
-                            field.setEditable(false);
-                            setposLabel(FileSub.currentpath);
-                            setfieldPane();
-                        }
-                        else{
-                            Label exist=new Label("---错误的指令，请输入正确的指令---");
-                            exist.setPrefSize(400,10);
-                            Writebox.getChildren().add(exist);
-                            AnchorPane.setTopAnchor(exist,15.0+(Writebox.getChildren().size()-3)*20);
-                            field.setEditable(false);
-                            setposLabel(FileSub.currentpath);
-                            setfieldPane();
-                        }
-                    }
-                    else if(orderString[0].equals("close"))
-                    {
-                        if(orderString[1].charAt(0)!='$')//操作的是文件
-                        {
-                            FileSub.close_file(orderString[1]);
-                            field.setEditable(false);
-                            setposLabel(FileSub.currentpath);
-                            setfieldPane();
-                        }
-                        //没有close文件夹的操作
-                    }
-                    else if(orderString[0].equals("delete"))
-                    {
-                        if(orderString[1].charAt(0)!='$')//操作的是文件
-                        {
-                            if(!FileSub.delete_file(orderString[1]))
-                            {
-                                errormessage("不存在该文件，请检查输入的文件名");
-                                return;
-                            }
-                            String[] pos=(FileSub.currentpath+"\\"+orderString[1]).split("\\\\");
-                            TreeItem<Pane> X=root;
-                            //如果是root直接用
-                            for (String po : pos) {
-                                for (int j = 0; j < X.getChildren().size(); j++) {
-                                    if (((Label) X.getChildren().get(j).getValue().getChildren().get(0)).getText().equals(po)) {
-                                        X = X.getChildren().get(j);//迭代
-                                        break;
-                                    }
-
+                                } else {
+                                    errormessage("不存在文件" + orderString[1]);
+                                    field.setEditable(false);
                                 }
-                            }
-                            item=X;
-                            delete_file_or_folder();
-                            field.setEditable(false);
-                            setposLabel(FileSub.currentpath);
-                            setfieldPane();
-                            flashWindows(orderString[1]);
-                            updatePie();
-                        }
-                        else{
-                            if(!FileSub.removedir(orderString[1].substring(1)))
-                            {
-                                errormessage("不存在该文件夹，请检查输入的文件夹名");
-                                return;
-                            }
-                            String[] pos=(FileSub.currentpath+"\\"+orderString[1].substring(1)).split("\\\\");
-
-                            TreeItem<Pane> X=root;
-                            //如果是root直接用
-                            for (String po : pos) {
-                                for (int j = 0; j < X.getChildren().size(); j++) {
-                                    if (((Label) X.getChildren().get(j).getValue().getChildren().get(0)).getText().equals(po)) {
-                                        X = X.getChildren().get(j);//迭代
-                                        break;
-                                    }
-
-                                }
-                            }
-                            item=X;
-                            delete_file_or_folder();
-                            field.setEditable(false);
-                            setposLabel(FileSub.currentpath);
-                            setfieldPane();
-                            flashWindows(orderString[1].substring(1));
-                            updatePie();
-                        }
-                    }
-                    else if(orderString[0].equals("search")) {
-                        if(orderString[1].charAt(0)!='$')//操作的是文件
-                        {
-                            File X=FileSub.typefile(orderString[1]);
-                            Label exist=new Label("---存在文件"+orderString[1]+"---");
-                            exist.setPrefSize(400,10);
-                            if(X==null)
-                            {
-                                exist=new Label("---不存在文件"+orderString[1]+"---");
-                                Writebox.getChildren().add(exist);
-                                AnchorPane.setTopAnchor(exist,15.0+(Writebox.getChildren().size()-3)*20);
-                                setposLabel(FileSub.currentpath);
-                                setfieldPane();
                             }
                             else{
-                                Label filetype=new Label("文件类型:"+X.type);
-                                filetype.setPrefSize(400,10);
-                                Label filesize=new Label("文件大小:"+X.size);
-                                filesize.setPrefSize(400,10);
-                                Writebox.getChildren().add(exist);
-                                AnchorPane.setTopAnchor(exist,15.0+(Writebox.getChildren().size()-3)*20);
-                                Writebox.getChildren().add(filetype);
-                                AnchorPane.setTopAnchor(filetype,15.0+(Writebox.getChildren().size()-3)*20);
-                                Writebox.getChildren().add(filesize);
-                                AnchorPane.setTopAnchor(filesize,15.0+((Writebox.getChildren().size()-3))*20);
-                                setposLabel(FileSub.currentpath);
-                                setfieldPane();
+                                errormessage("错误的指令");
+                                field.setEditable(false);
                             }
-
-                        }
-                        else{
-                            Folder X=FileSub.showdir(orderString[1].substring(1));
-                            Label exist=new Label("---存在文件夹"+orderString[1].split("\\.")[0]+"---");
-                            exist.setPrefSize(400,10);
-                            if(X==null)
+                            break;
+                        case "open":
+                            if(orderString[1].charAt(0)!='$')//操作的是文件
                             {
-                                exist=new Label("---不存在文件夹"+orderString[1].split("\\.")[0]+"---");
-                                Writebox.getChildren().add(exist);
-                                AnchorPane.setTopAnchor(exist,15.0+(Writebox.getChildren().size()-3)*20);
-                                setposLabel(FileSub.currentpath);
-                                setfieldPane();
+                                File X = FileSub.findfile(FileSub.currentpath + "\\" + orderString[1]);//在输入端只能通过当前位置来查找
+                                if (X != null) {
+                                    openfile(X);
+                                    if (X.flag == 0) {
+                                        FileSub.open_file(X.fileName, 1);//以读方式打开文件
+                                        field.setEditable(false);
+                                    } else {
+                                        FileSub.open_file(X.fileName, 0);
+                                        field.setEditable(false);
+                                    }
 
+                                } else {
+                                    errormessage("不存在文件" + orderString[1]);
+                                    field.setEditable(false);
+                                }
                             }
                             else
                             {
-                                Label filetype=new Label("文件类型:"+X.type);
-                                filetype.setPrefSize(400,10);
-                                Label filesize=new Label("文件大小:"+X.size);
-                                filesize.setPrefSize(400,10);
-                                Writebox.getChildren().add(exist);
-                                AnchorPane.setTopAnchor(exist,15.0+(Writebox.getChildren().size()-3)*20);
-                                Writebox.getChildren().add(filetype);
-                                AnchorPane.setTopAnchor(filetype,15.0+(Writebox.getChildren().size()-3)*20);
-                                Writebox.getChildren().add(filesize);
-                                AnchorPane.setTopAnchor(filesize,15.0+((Writebox.getChildren().size()-3))*20);
-                                setposLabel(FileSub.currentpath);
-                                setfieldPane();
-                            }
-                        }
-                        field.setEditable(false);
-                        setposLabel(FileSub.currentpath);
-                        setfieldPane();
-                    }
-                    else if(orderString[0].equals("change"))
-                    {
-                        String[] changeorder=orderString[1].split("\\.");
-                        FileSub.change(changeorder[0],changeorder[1]);
-                        field.setEditable(false);
-                        setposLabel(FileSub.currentpath);
-                        setfieldPane();
-                        //只能够改变文件
-                    }
-                    else if(orderString[0].equals("clear"))
-                    {
-                        Writebox.getChildren().clear();
-                        Writefield(260,0,commandPane);
-                    }
-                    else if(orderString[0].equals("cd")){
-                        Label exist=new Label("---路径不存在---");
-                        exist.setPrefSize(400,10);
-                        if(!FileSub.findFolder(orderString[1]))
-                        {
-                            Writebox.getChildren().add(exist);
-                            AnchorPane.setTopAnchor(exist,15.0+(Writebox.getChildren().size()-3)*20);
-                            setposLabel(FileSub.currentpath);
-                            setfieldPane();
-                        }
-                        else{
-                            FileSub.currentpath=orderString[1];
-                            setposLabel(FileSub.currentpath);
-                            setfieldPane();
-                        }
-                        FileSub.currentpath=orderString[1];
+                                boolean exist=FileSub.findFolder(FileSub.currentpath+"\\"+orderString[1].substring(1));//通过exist来查看文件夹是否存在
+                                if(!exist)
+                                {
+                                    errormessage("不存在文件夹"+orderString[1]);
+                                    field.setEditable(false);
+                                }
+                                else
+                                {
+                                    openfolder(FileSub.F);//执行打开文件的操作
+                                    field.setEditable(false);//setEditable可以让这个输入栏无法写入任何东西
+                                }
 
-                    }
-                    else
-                    {
-                        Label exist=new Label("---错误的指令，请输入正确的指令---");
-                        exist.setPrefSize(400,10);
-                        Writebox.getChildren().add(exist);
-                        AnchorPane.setTopAnchor(exist,15.0+(Writebox.getChildren().size()-3)*20);
-                        field.setEditable(false);
-                        setposLabel(FileSub.currentpath);
-                        setfieldPane();
+                            }
+                            break;
+                        case "create":
+                            if(orderString[1].equals("file"))//操作的是文件
+                            {
+                                createFile(1);//弹出弹框进行操作
+                                updatePie();
+                                field.setEditable(false);
+                                setinputmessage(FileSub.currentpath);
+                            }
+                            else if(orderString[1].equals("folder")){
+                                createFolder(1);
+                                updatePie();
+                                field.setEditable(false);
+                                setinputmessage(FileSub.currentpath);
+                            }
+                            else{
+                                errormessage("错误的指令，请输入正确的指令");
+                                field.setEditable(false);
+                            }
+                            break;
+                        case "close":
+                            if(orderString[1].charAt(0)!='$')//操作的是文件
+                            {
+                                FileSub.close_file(orderString[1]);
+                                field.setEditable(false);
+                                setinputmessage(FileSub.currentpath);
+                            }
+                            else{
+                                errormessage("错误的指令，请输入正确的指令");
+                                field.setEditable(false);
+                            }
+                            break;
+                            //没有close文件夹的操作
+                        case "delete":
+                            if(orderString[1].charAt(0)!='$')//操作的是文件
+                            {
+                                if(!FileSub.delete_file(orderString[1]))//如果FileSub中的delete函数返回false，那么说明不存在文件
+                                {
+                                    field.setEditable(false);
+                                    errormessage("不存在该文件，请检查输入的文件名");
+                                    return;
+                                }
+                                delete_file_or_folder(orderString[1]);
+                                field.setEditable(false);
+                                setinputmessage(FileSub.currentpath);
+                                flashWindows(orderString[1]);
+                                updatePie();
+                            }
+                            else{
+                                if(!FileSub.removedir(orderString[1].substring(1)))
+                                {
+                                    errormessage("不存在该文件夹，请检查输入的文件夹名");
+                                    return;
+                                }
+                                delete_file_or_folder(orderString[1].substring('$'));
+                                field.setEditable(false);
+                                setinputmessage(FileSub.currentpath);
+                                flashWindows(orderString[1].substring(1));
+                                updatePie();
+                            }
+                            break;
+                        case "search":
+                            if(orderString[1].charAt(0)!='$')//操作的是文件
+                            {
+                                File X=FileSub.typefile(orderString[1]);
+
+                                if(X==null)
+                                {
+                                    errormessage("不存在文件"+orderString[1]);
+                                    field.setEditable(false);
+                                }
+                                else{
+                                    field.setEditable(false);
+                                    searchfile(X);//运用同构函数，来实现不同输入值所实现的不同功能
+                                }
+
+                            }
+                            else{
+                                Folder X=FileSub.showdir(orderString[1].substring(1));
+                                Label exist=new Label("---存在文件夹"+orderString[1].split("\\.")[0]+"---");
+                                exist.setPrefSize(400,10);
+                                if(X==null)
+                                {
+                                    errormessage("不存在文件"+orderString[1]);
+                                    field.setEditable(false);
+                                }
+                                else
+                                {
+                                    field.setEditable(false);
+                                    searchfile(X);
+                                }
+                            }
+                            break;
+                        case "change":
+                            String[] changeorder=orderString[1].split("\\.");
+                            FileSub.change(changeorder[0],changeorder[1]);
+                            field.setEditable(false);
+                            setinputmessage(FileSub.currentpath);
+                            //只能够改变文件
+                            break;
+                        case "clear":
+                            Writebox.getChildren().clear();
+                            Writefield(260,0,commandPane);
+                            break;
+                        case "cd":
+                            if(!FileSub.findFolder(orderString[1]))
+                            {
+                                errormessage("路径不存在");
+                                field.setEditable(false);
+                            }
+                            else{
+                                FileSub.currentpath=orderString[1];
+                                setinputmessage(FileSub.currentpath);
+                            }
+                            break;
+                        default:
+                            errormessage("错误的指令，请输入正确的指令");
+                            field.setEditable(false);
+                            break;
                     }
                     changeDiskusing();
                     changeFAT();
@@ -619,6 +566,39 @@ public class HelloController {
             }
         });
     }
+    public void searchfile(File X)
+    {
+        Label exist=new Label("---存在文件"+X.fileName+"---");
+        exist.setPrefSize(400,10);
+        Label filetype=new Label("文件类型:"+GetFileType(X.type));
+        filetype.setPrefSize(400,10);
+        Label filesize=new Label("文件大小:"+X.size);
+        filesize.setPrefSize(400,10);
+        Writebox.getChildren().add(exist);
+        AnchorPane.setTopAnchor(exist,15.0+(Writebox.getChildren().size()-3)*20);
+        Writebox.getChildren().add(filetype);
+        AnchorPane.setTopAnchor(filetype,15.0+(Writebox.getChildren().size()-3)*20);
+        Writebox.getChildren().add(filesize);
+        AnchorPane.setTopAnchor(filesize,15.0+((Writebox.getChildren().size()-3))*20);
+        setinputmessage(FileSub.currentpath);
+    }
+    public void searchfile(Folder X)
+    {
+        Label exist=new Label("---存在文件夹"+X.folderName+"---");
+        exist.setPrefSize(400,10);
+        Label filetype=new Label("文件类型:"+GetFileType(X.type));
+        filetype.setPrefSize(400,10);
+        Label filesize=new Label("文件大小:"+X.size);
+        filesize.setPrefSize(400,10);
+        Writebox.getChildren().add(exist);
+        AnchorPane.setTopAnchor(exist,15.0+(Writebox.getChildren().size()-3)*20);
+        Writebox.getChildren().add(filetype);
+        AnchorPane.setTopAnchor(filetype,15.0+(Writebox.getChildren().size()-3)*20);
+        Writebox.getChildren().add(filesize);
+        AnchorPane.setTopAnchor(filesize,15.0+((Writebox.getChildren().size()-3))*20);
+        setinputmessage(FileSub.currentpath);
+    }
+
     public void flashWindows(String name)
     {
         for(int i=9;i<mainInterface.getChildren().size();i+=2)
@@ -709,14 +689,25 @@ public class HelloController {
 
 
     }
-    public void delete_file_or_folder()
+    public void delete_file_or_folder(String name)
     {
+        String[] pos=(FileSub.currentpath+"\\"+name).split("\\\\");//寻找出文件的位置
+        TreeItem<Pane> X=root;
+        //如果是root直接用
+        for (String po : pos) {
+            for (int j = 0; j < X.getChildren().size(); j++) {
+                if (((Label) X.getChildren().get(j).getValue().getChildren().get(0)).getText().equals(po)) {
+                    X = X.getChildren().get(j);//迭代
+                    break;
+                }
+            }
+        }
+        item=X;
         TreeItem<Pane> Par=item.getParent();
         Par.getChildren().remove(item);
         changeFAT();
         changeDiskusing();
     }
-
     public void openfile(File X) {
         if(X==null) {
             Label exist;
@@ -842,7 +833,10 @@ public class HelloController {
                 @Override
                 public void handle(ActionEvent actionEvent) {
                     FileSub.delete_pathfile(printcurrent());
-                    delete_file_or_folder();
+                    TreeItem<Pane> Par=item.getParent();
+                    Par.getChildren().remove(item);
+                    changeFAT();
+                    changeDiskusing();
                     flashWindows(name);
                     updatePie();
                 }
@@ -851,21 +845,9 @@ public class HelloController {
             filetypeItem.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(ActionEvent actionEvent) {
-                    File X=FileSub.typefile(name);
-                    Label exist=new Label("---存在文件"+name+"---");
-                    exist.setPrefSize(400,10);
-                    Label filetype=new Label("文件类型:"+X.type);
-                    filetype.setPrefSize(400,10);
-                    Label filesize=new Label("文件大小:"+X.size);
-                    filesize.setPrefSize(400,10);
-                    Writebox.getChildren().add(exist);
-                    AnchorPane.setTopAnchor(exist,15.0+(Writebox.getChildren().size()-3)*20);
-                    Writebox.getChildren().add(filetype);
-                    AnchorPane.setTopAnchor(filetype,15.0+(Writebox.getChildren().size()-3)*20);
-                    Writebox.getChildren().add(filesize);
-                    AnchorPane.setTopAnchor(filesize,15.0+((Writebox.getChildren().size()-3))*20);
-                    setposLabel(FileSub.currentpath);
-                    setfieldPane();
+                    File Q=FileSub.findfile(X.path);
+                    assert Q != null;
+                    searchfile(Q);
                 }
             });
             getItems().addAll(fileopenItem,filedeleteItem,filetypeItem);
@@ -888,7 +870,10 @@ public class HelloController {
                 public void handle(ActionEvent actionEvent) {
                     FileSub.removepathdir(printcurrent());
                     //点击删除按钮后执行remove和delete函数
-                    delete_file_or_folder();
+                    TreeItem<Pane> Par=item.getParent();
+                    Par.getChildren().remove(item);
+                    changeFAT();
+                    changeDiskusing();
                     flashWindows(name);
                     updatePie();
                 }
@@ -899,27 +884,14 @@ public class HelloController {
                 public void handle(ActionEvent actionEvent) {
                     //展示文件夹属性
                     Folder X=folder;
-                    Label exist=new Label("---存在文件夹"+name+"---");
-                    exist.setPrefSize(400,10);
-                    Label filetype=new Label("文件类型:"+X.type);
-                    filetype.setPrefSize(400,10);
-                    Label filesize=new Label("文件大小:"+X.size);
-                    filesize.setPrefSize(400,10);
-                    Writebox.getChildren().add(exist);
-                    AnchorPane.setTopAnchor(exist,15.0+(Writebox.getChildren().size()-3)*20);
-                    Writebox.getChildren().add(filetype);
-                    AnchorPane.setTopAnchor(filetype,15.0+(Writebox.getChildren().size()-3)*20);
-                    Writebox.getChildren().add(filesize);
-                    AnchorPane.setTopAnchor(filesize,15.0+((Writebox.getChildren().size()-3))*20);
-                    setposLabel(FileSub.currentpath);
-                    setfieldPane();
+                    searchfile(folder);
                 }
             });
             MenuItem folderMenuItem1 = new MenuItem("新建文件");
             folderMenuItem1.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(ActionEvent actionEvent) {
-                    createFile();
+                    createFile(0);
                     updatePie();
                 }
             });
@@ -928,7 +900,7 @@ public class HelloController {
             folderMenuItem2.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(ActionEvent actionEvent) {
-                    createFolder();
+                    createFolder(0);
                     updatePie();
                 }
             });
@@ -942,7 +914,7 @@ public class HelloController {
             fileMenuItem.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(ActionEvent actionEvent) {
-                    createFile();
+                    createFile(0);
                     updatePie();
                 }
             });
@@ -951,7 +923,7 @@ public class HelloController {
             folderMenuItem.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(ActionEvent actionEvent) {
-                    createFolder();
+                    createFolder(0);
                     updatePie();//点击新建文件夹之后新启动一个画面，来输入对应的信息进行新建
                 }
             });
@@ -1041,7 +1013,7 @@ public class HelloController {
         return X;
     }
     //新建文件窗口
-    public  void createFile(){
+    public  void createFile(int opertype){
         Pane filePane = new Pane();
         ImageView view = new ImageView();
         Image icon = new Image("Txt.png");
@@ -1093,11 +1065,20 @@ public class HelloController {
                 }
                 TreeItem<Pane> newItem=new TreeItem<>(make_Pane(filename,true));
                 newItem.setExpanded(false);
-                SetItem();//获取当前应当选中的item
+                if(opertype==1)
+                    SetItem();//获取当前应当选中的item
                 item.getChildren().add(newItem);
                 int index=FileSub.findFAT(3);//找到对应的空闲的盘块
-                FileSub.findFolder(printcurrent());//修改当前路径下的所在的文件夹
-                File X=new File(filename,printcurrent()+"\\"+filename,index,FileSub.F,0,1);
+                File X;
+                if(opertype==1)
+                {
+                    FileSub.findFolder(FileSub.currentpath);//修改当前路径下的所在的文件夹
+                    X=new File(filename,FileSub.currentpath+"\\"+filename,index,FileSub.F,4,0);
+                }
+                else{
+                    FileSub.findFolder(printcurrent());//修改当前路径下的所在的文件夹
+                    X=new File(filename,printcurrent()+"\\"+filename,index,FileSub.F,4,0);
+                }
                 boolean can=FileSub.F.addChildrenNode(X);//当前的文件夹数据添加文件节点，并更新数据
                 if(!can)
                 {
@@ -1156,7 +1137,7 @@ public class HelloController {
     }
 
     //新建文件夹窗口
-    public  void createFolder(){
+    public  void createFolder(int opertype){
         Pane folderPane = new Pane();
         Image icon1 = new Image("File.png");
         ImageView view1 = new ImageView();
@@ -1201,9 +1182,14 @@ public class HelloController {
                 }
                 TreeItem<Pane> newItem=new TreeItem<>(make_Pane(filename,false));
                 newItem.setExpanded(true);
-                SetItem();//获取当前应当选中的item
+                if(opertype==1)
+                {
+                    SetItem();//获取当前应当选中的item
+                    FileSub.mkpathdir(filename,FileSub.currentpath);
+                }
+                else
+                    FileSub.mkpathdir(filename,printcurrent());
                 item.getChildren().add(newItem);
-                FileSub.mkpathdir(filename,printcurrent());
                 //对后端数据的修改
                 Image FilePicture=new Image("File.png");
                 ImageView FP=new ImageView();
@@ -1244,21 +1230,19 @@ public class HelloController {
     public void SetItem()
     {
         String[] pos=FileSub.currentpath.split("\\\\");
-        if(item==null)
-        {
-            TreeItem<Pane> X=root;
-            //如果是root直接用
-            for (String po : pos) {
-                for (int j = 0; j < X.getChildren().size(); j++) {
-                    if (((Label) X.getChildren().get(j).getValue().getChildren().get(0)).getText().equals(po)) {
-                        X = X.getChildren().get(j);//迭代
-                        break;
-                    }
-
+        TreeItem<Pane> X=root;
+        //如果是root直接用
+        for (String po : pos) {
+            for (int j = 0; j < X.getChildren().size(); j++) {
+                if (((Label) X.getChildren().get(j).getValue().getChildren().get(0)).getText().equals(po)) {
+                    X = X.getChildren().get(j);//迭代
+                    break;
                 }
+
             }
-            item=X;
         }
+        item=X;
+
     }
     public String  printcurrent()//获取当前路径
     {
