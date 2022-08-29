@@ -5,7 +5,7 @@ import java.util.ArrayList;
 
 public class disk {
     Folder root;//根目录
-    ArrayList<FileTable> filesOpened;//记录文件是否打开的列表
+    ArrayList<FileTable> filesOpened=new ArrayList<>();//记录文件是否打开的列表
     Block[] blocks;//128个磁盘块数组
     public  disk()
     {
