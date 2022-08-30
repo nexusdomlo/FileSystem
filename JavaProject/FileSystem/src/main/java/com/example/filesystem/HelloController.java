@@ -1,5 +1,4 @@
 package com.example.filesystem;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -30,8 +29,6 @@ import java.io.*;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-
 public class HelloController {
     @FXML
     private AnchorPane mainInterface;
@@ -184,6 +181,7 @@ public class HelloController {
                     File X=(File)FileSub.Disk.blocks[i].object;
                     beginnum=X.num;//记录起始盘块号
                     index=FileSub.Disk.blocks[i].index;
+                    System.out.println(index);
                     name=X.fileName;
                     type=X.type;
                     begin=FileSub.Disk.blocks[i].begin;
@@ -344,6 +342,7 @@ public class HelloController {
         }
     }
     static Pane commandPane = new Pane();
+    boolean initlazie=false;
     //存储按钮
     @FXML
     void Store(MouseEvent event) {
@@ -368,7 +367,10 @@ public class HelloController {
         FileSub.currentpath="ROOT";
         changeFAT();
         changeDiskusing();
-        setpicture();
+        if(!initlazie) {
+            setpicture();
+            initlazie=true;
+        }
     }
     public VBox numberBox = new VBox();
     public static VBox contentBox = new VBox();
@@ -848,14 +850,30 @@ public class HelloController {
             fileStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
                 @Override
                 public void handle(WindowEvent windowEvent) {
-
-                    try {
-                        X.changeFileContent(textArea.getText());
-                        updatePie();
-                        changeFAT();
-                        changeDiskusing();
-                    } catch (UnsupportedEncodingException e) {
-                        throw new RuntimeException(e);
+                    if(!X.content.equals(textArea.getText()))
+                    {
+                        Dialog<ButtonType>dialog=new Dialog<>();
+                        DialogPane dialogPane=dialog.getDialogPane();
+                        dialog.setContentText("是否保存文本内容");
+                        dialogPane.setPrefSize(300,100);
+                        ObservableList<ButtonType>buttonTypes=dialogPane.getButtonTypes();
+                        buttonTypes.addAll(ButtonType.OK,ButtonType.CANCEL);
+                        Button apply=(Button) dialogPane.lookupButton(ButtonType.OK);
+                        apply.setOnAction(actionEvent -> {
+                            try {
+                                X.changeFileContent(textArea.getText());
+                                FileSub.Disk.blocks[X.num].begin=true;
+                                updatePie();
+                                changeFAT();
+                                changeDiskusing();
+                            } catch (UnsupportedEncodingException e) {
+                                throw new RuntimeException(e);
+                            }
+                        });
+                        Button cancel=(Button) dialogPane.lookupButton(ButtonType.CANCEL);
+                        cancel.setOnAction(actionEvent -> {
+                        });
+                        dialog.showAndWait();
                     }
                 }
             });
