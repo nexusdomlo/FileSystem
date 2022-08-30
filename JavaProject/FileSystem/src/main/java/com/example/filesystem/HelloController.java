@@ -25,16 +25,81 @@ import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-
+import java.sql.*;
 import java.io.*;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class HelloController {
     @FXML
     private AnchorPane mainInterface;
-    public TreeItem<Pane> item;
+    public static TreeItem<Pane> item;
+    public void setpicture()
+    {
+        for(int i=3;i<FileSub.Disk.blocks.length;i++)
+        {
+            if(FileSub.Disk.blocks[i].begin)
+            {
+                if(FileSub.Disk.blocks[i].object==null)
+                    continue;
+                if(FileSub.Disk.blocks[i].object.getClass().toString().equals("class com.example.filesystem.Folder"))
+                {
+                    Folder folder=(Folder)FileSub.Disk.blocks[i].object;
+                    Image FilePicture=new Image("File.png");
+                    ImageView FP=new ImageView();
+                    FP.setImage(FilePicture);
+                    FP.setFitWidth(40);
+                    FP.setFitHeight(40);
+                    Label label=new Label(folder.folderName);
+                    mainInterface.getChildren().addAll(FP,label);
+                    AnchorPane.setTopAnchor(FP,10.0+((mainInterface.getChildren().size()-3)%28/2)*65);
+                    AnchorPane.setLeftAnchor(FP,10.0+(mainInterface.getChildren().size()/32)*65);
+                    AnchorPane.setTopAnchor(label,55.0+((mainInterface.getChildren().size()-3)%28/2)*65);
+                    AnchorPane.setLeftAnchor(label,19.0+(mainInterface.getChildren().size()/32)*65);
+                    FP.addEventFilter(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+                        @Override
+                        public void handle(MouseEvent mouseEvent) {
+                            if(mouseEvent.getButton()==MouseButton.SECONDARY)
+                            {
+                                FolderMenu X=new FolderMenu();
+                                X.folder=folder;
+                                X.name=folder.folderName;
+                                X.show(FP,Side.BOTTOM,0,0);
+                            }
+                        }
+                    });
+                }
+                else if(FileSub.Disk.blocks[i].object.getClass().toString().equals("class com.example.filesystem.File")){
+                    File X=(File)FileSub.Disk.blocks[i].object;
+                    Image FilePicture=new Image("Txt.png");
+                    ImageView FP=new ImageView();
+                    FP.setImage(FilePicture);
+                    FP.setFitWidth(40);
+                    FP.setFitHeight(40);
+                    Label label=new Label(X.fileName);
+                    mainInterface.getChildren().addAll(FP,label);
+                    AnchorPane.setTopAnchor(FP,10.0+((mainInterface.getChildren().size()-3)%28/2)*65);
+                    AnchorPane.setLeftAnchor(FP,10.0+(mainInterface.getChildren().size()/32)*65);
+                    AnchorPane.setTopAnchor(label,55.0+((mainInterface.getChildren().size()-3)%28/2)*65);
+                    AnchorPane.setLeftAnchor(label,19.0+(mainInterface.getChildren().size()/32)*65);
+                    FP.addEventFilter(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+                        @Override
+                        public void handle(MouseEvent mouseEvent) {
+                            if(mouseEvent.getButton()== MouseButton.SECONDARY)
+                            {
+                                FileMenu G=new FileMenu();
+                                G.file =X;
+                                G.name=X.fileName;
+                                G.show(FP, Side.BOTTOM,0,0);
+                            }
+                        }
+                    });
+                }
+            }
+        }
+    }
     //帮助按钮点击事件
     @FXML
     void initIllustrate() {
@@ -52,50 +117,91 @@ public class HelloController {
 
         helpStage.show();
     }
-/*    public void Keepdata(){
-        BufferedWriter bufferedWriter = null;
-        BufferedWriter bufferedWriter1 =null;
-        try {
-            bufferedWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("DISK.txt"), "UTF-8"));
-            bufferedWriter1 = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("DISK.txt"), "UTF-8"));
-            for(int i=0;i< FileSub.FatTable.IndexArray.length;i++)
-            {
-                if(i<2)
-                {
-                    bufferedWriter.write(i +" "+FileSub.FatTable.IndexArray[i]+" FAT "+"-1");//记录前两个block的数据
-                    bufferedWriter.newLine();//保存FAT数据
-                }
-                else {
-                    if(FileSub.Disk.blocks[i].object.getClass().toString().equals("class com.example.filesystem.Folder"))
-                    {
-                        bufferedWriter.write(i +" "+FileSub.FatTable.IndexArray[i]+" "+((Folder)FileSub.Disk.blocks[i].object).folderName+" "+FileSub.Disk.blocks[i].begin);//保存文件夹数据
-                        bufferedWriter.newLine();//保存FAT数据
-                    }
-                    else if(FileSub.Disk.blocks[i].object.getClass().toString().equals("class com.example.filesystem.File"))
-                    {
-                        bufferedWriter.write(i +" "+FileSub.FatTable.IndexArray[i]+" "+((File)FileSub.Disk.blocks[i].object).fileName+" "+FileSub.Disk.blocks[i].begin);//保存文件夹数据
-                        bufferedWriter.newLine();//保存FAT数据
-                    }else{
-                        bufferedWriter.write(i +" "+FileSub.FatTable.IndexArray[i]+" null "+"-1");//保存文件夹数据
-                        bufferedWriter.newLine();//保存FAT数据
-                    }
-                }
-            }
-            bufferedWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("FAT.txt"), "UTF-8"));
 
-        } catch (Exception e) {
 
-        } finally {
-            try {
-                if (bufferedWriter != null) {
-                    bufferedWriter.close();
-                    bufferedWriter.close();
-                }
-            } catch (Exception e) {
-
-            }
+    public static  String sqlpath(String path)
+    {
+        String[] sqlp=path.split("\\\\");
+        String answer="ROOT";
+        for(int i=1;i<sqlp.length;i++){
+            answer=answer+"\\\\"+sqlp[i];
         }
-    }*/
+        return answer;
+    }
+
+    public static void Keepdata(){
+        try{
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection conn=DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306?characterEncoding=UTF-8","root","22371X");
+            Statement state=conn.createStatement();
+            String sql_order="select * from information_schema.SCHEMATA where SCHEMA_NAME = 'filesystem';";
+            ResultSet rs=state.executeQuery(sql_order);
+            if(!rs.next())
+            {
+                sql_order="create database FileSystem;";
+                state.execute(sql_order);//没有数据库就创建一个新的数据库
+            }
+            conn=DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/filesystem?characterEncoding=UTF-8","root","22371X");
+            state=conn.createStatement();
+            DatabaseMetaData metaData= conn.getMetaData();
+            rs=metaData.getTables(null,null,"Disk",null);
+            if(rs.next())
+                state.execute("drop table Disk");
+            sql_order="create table Disk(fnum INT,fbeginnum INT,findex INT,fname varchar(10),ftype INT,fbegin BIT,fpath varchar(100),fcontent varchar(400),fparent varchar(4),fsize INT);";
+            state.execute(sql_order);//创建一个table 名字叫disk，数据类型分别是num，初始盘块号，name 文件或者是文件夹的名字，type 数据类型（判断他是文件还是文件夹),begin是否为初始盘块，path为路径，content 是内容，parent是父目录项，size是大小，item是子节点
+            int num=0;
+            String name="";
+            int type=0;
+            int index=0;
+            int beginnum=0;
+            boolean begin=true;
+            String path="";
+            String content="";
+            String parent="";
+            int size=0;
+            for(int i=0;i<FileSub.Disk.blocks.length;i++)
+            {
+                num=i;//记录这是第几块
+                if(FileSub.Disk.blocks[i].object==null)
+                    continue;
+                else if(FileSub.Disk.blocks[i].object.getClass().toString().equals("class com.example.filesystem.Folder"))
+                {
+                    Folder X=(Folder)FileSub.Disk.blocks[i].object;
+                    beginnum=X.num;//记录起始盘块号
+                    index=FileSub.Disk.blocks[i].index;
+                    name=X.folderName;
+                    type=X.type;
+                    begin=FileSub.Disk.blocks[i].begin;//判断这是不是第一块
+                    path=sqlpath(X.path);
+                    content="";
+                    if(X.parent==null)
+                        parent="null";
+                    else
+                        parent=X.parent.folderName;
+                    size=64;
+                }
+                else if(FileSub.Disk.blocks[i].object.getClass().toString().equals("class com.example.filesystem.File")){
+                    File X=(File)FileSub.Disk.blocks[i].object;
+                    beginnum=X.num;//记录起始盘块号
+                    index=FileSub.Disk.blocks[i].index;
+                    name=X.fileName;
+                    type=X.type;
+                    begin=FileSub.Disk.blocks[i].begin;
+                    path=sqlpath(X.path);
+                    content=X.content;
+                    if(X.parent==null)
+                        parent="null";
+                    else
+                        parent=X.parent.folderName;
+                    size=X.size;
+                }
+                sql_order="insert into Disk(fnum,fbeginnum,findex,fname,ftype,fbegin,fpath,fcontent,fparent,fsize) values("+num+','+beginnum+','+index+",'"+name+"'"+','+type+','+begin+",'"+path+"'"+",'"+content+"'"+",'"+parent+"'"+','+size+");";
+                state.execute(sql_order);
+            }
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
     //关于我们按钮点击事件
     @FXML
@@ -120,11 +226,14 @@ public class HelloController {
         aboutStage.setTitle("关于我们");
         aboutStage.show();
     }
-    public TreeItem<Pane>  root = new TreeItem<>(make_Pane("ROOT",true));//在treeitem中初始化一个root节点
-    public TreeView treeView = new TreeView(root);
+    public static TreeItem<Pane> root=null;//在treeitem中初始化一个root节点
+    public TreeView treeView;
     public void addTreeitem(Pane commandPane)
     {
         //左侧树形区域
+        if(root==null)
+            root=new TreeItem<>(make_Pane("ROOT",true));
+        treeView=new TreeView<>(root);
         AnchorPane vb=new AnchorPane();
         root.setExpanded(true);
         treeView.setPrefSize(250,800);//设置树形区的大小
@@ -174,7 +283,7 @@ public class HelloController {
         pieChart.setStartAngle(90);
         commandPane.getChildren().add(pieChart);
     }
-    public void updatePie()
+    public static void updatePie()
     {
         commandPane.getChildren().remove(pieChart);
         int count=0;
@@ -199,7 +308,7 @@ public class HelloController {
         pieChart.setStartAngle(90);
     }
 
-    public GridPane myPane = new GridPane();
+    public static GridPane myPane = new GridPane();
     public void addDiskUsing(double x,double y,Pane commandPane)
     {
         //diskUsing区域
@@ -223,7 +332,7 @@ public class HelloController {
         myPane.setLayoutX(x);
         commandPane.getChildren().add(myPane);
     }
-    public void changeDiskusing()
+    public static void changeDiskusing()
     {
         for(int i = 0; i < 128; ++i) {
             StackPane X=(StackPane) myPane.getChildren().get(i);
@@ -234,7 +343,7 @@ public class HelloController {
 
         }
     }
-    Pane commandPane = new Pane();
+    static Pane commandPane = new Pane();
     //存储按钮
     @FXML
     void Store(MouseEvent event) {
@@ -259,9 +368,10 @@ public class HelloController {
         FileSub.currentpath="ROOT";
         changeFAT();
         changeDiskusing();
+        setpicture();
     }
     public VBox numberBox = new VBox();
-    public VBox contentBox = new VBox();
+    public static VBox contentBox = new VBox();
     public void addFAT(double x,double y,Pane commandPane)
     {
         //FAT表
@@ -300,7 +410,7 @@ public class HelloController {
             numberBox.getChildren().add(stackPane);
         }
     }
-    public void changeFAT()
+    public static void changeFAT()
     {
         for(int i = 0; i < 128; ++i) {
             StackPane stackPane=(StackPane) contentBox.getChildren().get(i);
@@ -325,7 +435,7 @@ public class HelloController {
         setposLabel(path);
         setfieldPane();
     }
-    public String GetFileType(int type)
+    public static String GetFileType(int type)
     {
         String X="";
         while(type>0)
@@ -361,7 +471,7 @@ public class HelloController {
         }
 
     }
-    public AnchorPane Writebox = new AnchorPane();//用AnchorPane设置输入栏的文字和位置
+    public static AnchorPane Writebox = new AnchorPane();//用AnchorPane设置输入栏的文字和位置
     public void setfieldPane()
     {
         TextField field = new TextField();
@@ -393,6 +503,7 @@ public class HelloController {
                                 if (X != null) {
                                     openfile(X);
                                     FileSub.open_file(X.fileName,1);
+                                    setinputmessage(FileSub.currentpath);
                                     field.setEditable(false);
 
                                 } else {
@@ -413,9 +524,11 @@ public class HelloController {
                                     openfile(X);
                                     if (X.flag == 0) {
                                         FileSub.open_file(X.fileName, 1);//以读方式打开文件
+                                        setinputmessage(FileSub.currentpath);
                                         field.setEditable(false);
                                     } else {
                                         FileSub.open_file(X.fileName, 0);
+                                        setinputmessage(FileSub.currentpath);
                                         field.setEditable(false);
                                     }
 
@@ -435,6 +548,7 @@ public class HelloController {
                                 else
                                 {
                                     openfolder(FileSub.F);//执行打开文件的操作
+                                    setinputmessage(FileSub.currentpath);
                                     field.setEditable(false);//setEditable可以让这个输入栏无法写入任何东西
                                 }
 
@@ -621,7 +735,7 @@ public class HelloController {
         }
     }
 
-    public void setposLabel(String pathname)
+    public static void setposLabel(String pathname)
     {
         Label label = new Label(pathname+":\\>");
         label.setPrefSize(400,13);//设置文字的大小
@@ -629,7 +743,7 @@ public class HelloController {
         AnchorPane.setLeftAnchor(label,0.0);
         AnchorPane.setTopAnchor(label,10.0+(Writebox.getChildren().size()-2)*20);
     }
-    public  void Writefield(double x,double y,Pane commandPane)
+    public void Writefield(double x, double y, Pane commandPane)
     {
         //输入指令部分
         //单行输入框
@@ -1004,7 +1118,7 @@ public class HelloController {
             }
         });
     }
-    public Pane make_Pane(String name,boolean is)
+    public static Pane make_Pane(String name, boolean is)
     {
         Pane X=new Pane();
         Label Xname=new Label(name);
@@ -1031,7 +1145,7 @@ public class HelloController {
         return X;
     }
     //新建文件窗口
-    public  void createFile(int opertype){
+    public void createFile(int opertype){
         Pane filePane = new Pane();
         ImageView view = new ImageView();
         Image icon = new Image("Txt.png");
@@ -1146,7 +1260,7 @@ public class HelloController {
             }
         });
     }
-    public  void ErrorWindows(String ErrorType,String ErrorString)
+    public static void ErrorWindows(String ErrorType, String ErrorString)
     {
         Alert alert=new Alert(Alert.AlertType.ERROR);
         alert.setTitle("错误");
@@ -1156,7 +1270,7 @@ public class HelloController {
     }
 
     //新建文件夹窗口
-    public  void createFolder(int opertype){
+    public void createFolder(int opertype){
         Pane folderPane = new Pane();
         Image icon1 = new Image("File.png");
         ImageView view1 = new ImageView();
@@ -1249,7 +1363,7 @@ public class HelloController {
             }
         });
     }
-    public void SetItem(String path)
+    public static void SetItem(String path)
     {
         String[] pos=path.split("\\\\");
         TreeItem<Pane> X=root;
@@ -1266,7 +1380,7 @@ public class HelloController {
         item=X;
 
     }
-    public String  printcurrent()//获取当前路径
+    public static String  printcurrent()//获取当前路径
     {
         String road = "";
         for(TreeItem<Pane> it=item;!((Label)it.getValue().getChildren().get(0)).getText().equals("ROOT");it=it.getParent())

@@ -11,9 +11,9 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane fx:id="mainInterface" prefHeight="1000.0" prefWidth="1400.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.filesystem.HelloController">
+<AnchorPane fx:id="mainInterface" prefHeight="800.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.filesystem.HelloController">
     <children>
-        <ImageView fx:id="main_BG" fitHeight="960.0" fitWidth="1600.0" pickOnBounds="true" preserveRatio="true">
+        <ImageView fx:id="main_BG" fitHeight="800.0" fitWidth="1200.0" pickOnBounds="true" preserveRatio="true">
 
             <image>
                 <Image url="@../../../main_BG.jpg" />
@@ -34,7 +34,7 @@
                 <Image url="@../../../Storage.png" />
             </image>
         </ImageView>
-        <MenuBar fx:id="startMenuBar" layoutX="6.0" layoutY="960.0" prefHeight="40.0" prefWidth="40.0">
+        <MenuBar fx:id="startMenuBar" layoutY="765.0" prefHeight="40.0" prefWidth="40.0">
             <menus>
                 <Menu mnemonicParsing="false">
                     <items>

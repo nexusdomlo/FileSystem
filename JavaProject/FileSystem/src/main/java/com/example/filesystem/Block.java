@@ -12,7 +12,6 @@ public class Block {
         setObject(object);
         this.object=object;
         this.begin=begin;
-
     }
     void setObject(Object object)
     {
