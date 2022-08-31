@@ -227,19 +227,25 @@ public class FileSub {
     }
     public static boolean change(String filename,String t)
     {
+/*        for(int i=0;i<F.item.size();i++)
+        {
+            System.out.println(F.item.get(i).split("\\.")[0]);
+        }*/
+        System.out.println(t);
         for(int i=0;i<F.item.size();i++)
         {
-            if(F.item.get(i).equals(filename))
+            if(F.item.get(i).split("\\.")[0].equals(filename))
             {
-                for(int j=0;j<Disk.filesOpened.size();j++)
-                    if(Disk.filesOpened.get(j).path.equals(currentpath+"\\"+filename))
-                        return false;
                 File file=(File)F.children.get(i);
                 if(t.equals("OR"))
-                    file.type=1;
-                else if(t.equals("RAW"))
-                    file.type=0;//更改文件的属性
-                else
+                {
+                    file.flag=1;
+                    return true;
+                }
+                else if(t.equals("RAW")) {
+                    file.flag = 0;//更改文件的属性
+                    return true;
+                }else
                     return false;
                 /*然后就是将file中的各项信息展示出来*/
             }

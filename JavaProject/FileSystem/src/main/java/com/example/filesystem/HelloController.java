@@ -30,6 +30,83 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 public class HelloController {
+    public void operDatabase(String parentname, Folder parent, TreeItem<Pane> it) throws ClassNotFoundException, SQLException {
+        Class.forName("com.mysql.cj.jdbc.Driver");
+        Connection conn=DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/filesystem?characterEncoding=UTF-8","root","22371X");
+        Statement state=conn.createStatement();
+        String sql_order="select * from Disk where fparent="+"'"+parentname+"'";
+        ResultSet rs=state.executeQuery(sql_order);
+        while(rs.next())
+        {
+            if(rs.getInt("ftype")!=8)
+            {
+                File X=new File(rs.getString("fname"),rs.getString("fpath"),rs.getInt("fbeginnum"),parent,rs.getInt("ftype"),0);
+                X.content=rs.getString("fcontent");
+                int index=rs.getInt("findex");
+                FileSub.FatTable.IndexArray[rs.getInt("fnum")]=index;
+                if(rs.getBoolean("fbegin"))
+                {
+                    parent.addChildrenNode(X);
+                    TreeItem<Pane>i=new TreeItem<>(make_Pane(X.fileName,true));
+                    it.getChildren().add(i);
+                }
+                FileSub.Disk.blocks[rs.getInt("fnum")].BlockChange(index,X,rs.getBoolean("fbegin"));
+                //设置文本的图标位置
+            }
+            else{
+                Folder folder=new Folder(rs.getString("fname"),rs.getString("fpath"),rs.getInt("fbeginnum"),parent);
+                FileSub.Disk.blocks[rs.getInt("fnum")].BlockChange(rs.getInt("findex"),folder,rs.getBoolean("fbegin"));
+                TreeItem<Pane>i=new TreeItem<>(make_Pane(folder.folderName,true));
+                FileSub.FatTable.IndexArray[rs.getInt("fnum")]=rs.getInt("findex");
+                if(root==null)
+                {
+                    root=i;
+                    operDatabase(folder.folderName,FileSub.Disk.root,i);
+                }
+                else if(it!=null)
+                {
+                    it.getChildren().add(i);
+                    parent.addChildrenNode(folder);
+                    operDatabase(folder.folderName,folder,i);
+                }
+                //递归的寻找并构建
+            }
+        }
+
+    }
+    public void setDiskblocksindex()
+    {
+        for(int i=0;i<FileSub.Disk.blocks.length;i++)
+        {
+            if(FileSub.Disk.blocks[i].object==null)
+                continue;
+            FileSub.Disk.blocks[i].index=FileSub.FatTable.IndexArray[i];
+        }
+
+    }
+
+    public void getData()
+    {
+        try{
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection conn= DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306?characterEncoding=UTF-8","root","22371X");
+            Statement state=conn.createStatement();
+            String sql_order="select * from information_schema.SCHEMATA where SCHEMA_NAME = 'filesystem';";
+            ResultSet rs=state.executeQuery(sql_order);
+            if(!rs.next())
+            {
+                return;//如果为空就直接不读
+            }
+            DatabaseMetaData metaData= conn.getMetaData();
+            rs=metaData.getTables(null,null,"Disk",null);
+            if(!rs.next())
+                return;
+            operDatabase("null",null,null);
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     @FXML
     private AnchorPane mainInterface;
     public static TreeItem<Pane> item;
@@ -181,7 +258,6 @@ public class HelloController {
                     File X=(File)FileSub.Disk.blocks[i].object;
                     beginnum=X.num;//记录起始盘块号
                     index=FileSub.Disk.blocks[i].index;
-                    System.out.println(index);
                     name=X.fileName;
                     type=X.type;
                     begin=FileSub.Disk.blocks[i].begin;
@@ -342,10 +418,16 @@ public class HelloController {
         }
     }
     static Pane commandPane = new Pane();
-    boolean initlazie=false;
+    public static boolean initlazie=false;
     //存储按钮
     @FXML
     void Store(MouseEvent event) {
+        if(initlazie) {//如果需要初始化就执行
+            getData();
+            setDiskblocksindex();
+            setpicture();
+            initlazie=false;
+        }
         commandPane=new Pane();
         Scene scene = new Scene(commandPane,1000,800);//750的宽度，550的高度
         Stage startStage = new Stage();
@@ -367,10 +449,8 @@ public class HelloController {
         FileSub.currentpath="ROOT";
         changeFAT();
         changeDiskusing();
-        if(!initlazie) {
-            setpicture();
-            initlazie=true;
-        }
+/*        for(int i=0;i<FileSub.Disk.root.children.size();i++)
+            System.out.println(1);*/
     }
     public VBox numberBox = new VBox();
     public static VBox contentBox = new VBox();
@@ -452,8 +532,6 @@ public class HelloController {
             }
             type=type/2;
         }
-        System.out.println(X);
-        System.out.println(X.charAt(2));
         if(X.length()==4)
             return "目录项";
         else{
